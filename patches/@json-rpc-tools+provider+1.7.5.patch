@@ -1,0 +1,13 @@
+diff --git a/node_modules/@json-rpc-tools/provider/dist/cjs/http.js b/node_modules/@json-rpc-tools/provider/dist/cjs/http.js
+index 996742e..0c248c6 100644
+--- a/node_modules/@json-rpc-tools/provider/dist/cjs/http.js
++++ b/node_modules/@json-rpc-tools/provider/dist/cjs/http.js
+@@ -51,7 +51,7 @@ class HttpConnection {
+                 this.api = yield this.register();
+             }
+             this.api
+-                .post("/", payload)
++                .post("", payload)
+                 .then(res => this.onPayload(res))
+                 .catch(err => this.onError(payload.id, err));
+         });

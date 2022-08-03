@@ -1,0 +1,60 @@
+{
+  "name": "@fireblocks/fireblocks-web3-provider",
+  "version": "0.0.1",
+  "description": "EIP-1193 Compatible Ethereum provider for Fireblocks",
+  "repository": "github:fireblocks/fireblocks-web3-provider",
+  "author": "Fireblocks",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "ethereum",
+    "smart-contracts",
+    "wallet",
+    "fireblocks",
+    "jsonrpc",
+    "web3",
+    "crypto",
+    "cryptocurrency",
+    "dapp"
+  ],
+  "scripts": {
+    "lint:fix": "prettier --write 'src/**/*.{js,ts}' 'test/**/*.{js,ts}' && tslint --fix --config tslint.json --project tsconfig.json",
+    "lint": "tslint --config tslint.json --project tsconfig.json",
+    "test": "mocha --exit --recursive 'test/**/*.test.ts'",
+    "build": "tsc",
+    "watch": "tsc -w",
+    "prepublishOnly": "npm run build",
+    "postinstall": "patch-package"
+  },
+  "files": [
+    "dist/",
+    "src/",
+    "LICENSE",
+    "README.md"
+  ],
+  "devDependencies": {
+    "@json-rpc-tools/provider": "^1.7.5",
+    "@json-rpc-tools/utils": "1.7.5",
+    "@types/chai": "^4.3.1",
+    "@types/mocha": "^9.1.1",
+    "@types/web3": "^1.2.2",
+    "eip1193-provider": "^1.0.1",
+    "ethers": "^5.6.9",
+    "fireblocks-sdk": "^2.3.1",
+    "mocha": "^10.0.0",
+    "ts-node": "^10.8.1",
+    "tslint": "^6.1.3",
+    "tslint-config-prettier": "^1.18.0",
+    "tslint-plugin-prettier": "^2.3.0",
+    "typescript": "^4.7.4",
+    "web3": "^1.7.4"
+  },
+  "dependencies": {
+    "chai": "^4.3.6",
+    "patch-package": "^6.4.7"
+  }
+}
