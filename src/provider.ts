@@ -321,7 +321,11 @@ export class FireblocksWeb3Provider extends EthereumProvider {
     let finalContent = content;
 
     if (type === RawMessageType.EIP712) {
-      finalContent = JSON.parse(content);
+      if (typeof content !== 'object') {
+        finalContent = JSON.parse(content);
+      } else {
+        finalContent = content;
+      }
     } else if (finalContent.startsWith("0x")) {
       finalContent = finalContent.substring(2);
     }
