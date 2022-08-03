@@ -191,6 +191,14 @@ export class FireblocksWeb3Provider extends EthereumProvider {
     }
   }
 
+  public send(
+    payload: any,
+    callback: (error: any, response: any) => void
+  ): void {
+    return this.sendAsync(payload, callback);
+  }
+
+
   public sendAsync(
     payload: any,
     callback: (error: any, response: any) => void
