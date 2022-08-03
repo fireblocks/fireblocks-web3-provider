@@ -1,7 +1,7 @@
 # Fireblocks Web3 Provider
 > **Warning**  
-> This package is in an early beta stage and should not be used in production environments.
-> The provided interfaces are likely to have breaking changes.
+> This package is in an early beta stage and should not be used in production environments.  
+> The provided SDK is likely to have breaking changes.
 
 [EIP-1193](eips.ethereum.org/EIPS/eip-1193) Compatible Ethereum provider for Fireblocks
 
