@@ -1,7 +1,7 @@
 # Fireblocks Web3 Provider
 > **Warning**  
 > This package is in an early beta stage and should not be used in production environments.  
-> The provided interfaces are likely to have breaking changes.
+> The provided interfaces are likely to have breaking changes.  
 > For a stable library (with a different paradigm) you can use the DeFi SDK (https://github.com/fireblocks/fireblocks-defi-sdk)
 
 
