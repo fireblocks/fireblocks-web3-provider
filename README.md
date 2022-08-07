@@ -1,3 +1,5 @@
+[![npm version](https://badge.fury.io/js/@fireblocks%2Ffireblocks-web3-provider.svg)](https://badge.fury.io/js/@fireblocks%2Ffireblocks-web3-provider)
+
 # Fireblocks Web3 Provider
 > **Warning**  
 > This package is in an early beta stage and should not be used in production environments.  
