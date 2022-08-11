@@ -7,7 +7,7 @@
 > For a stable library (with a different paradigm) you can use the DeFi SDK (https://github.com/fireblocks/fireblocks-defi-sdk)
 
 
-Fireblocks [EIP-1193](eips.ethereum.org/EIPS/eip-1193) Compatible Ethereum JavaScript Provider
+Fireblocks [EIP-1193](https://eips.ethereum.org/EIPS/eip-1193) Compatible Ethereum JavaScript Provider
 
 ## Installation
 ```bash
