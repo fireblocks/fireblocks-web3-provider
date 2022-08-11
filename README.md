@@ -17,7 +17,6 @@ npm install @fireblocks/fireblocks-web3-provider
 ## Setup
 ```js
 import { FireblocksWeb3Provider, ChainId } from "@fireblocks/fireblocks-web3-provider";
-import { readFileSync } from "fs"
 
 const eip1193Provider = new FireblocksWeb3Provider({
     privateKey: process.env.FIREBLOCKS_API_PRIVATE_KEY_PATH,
