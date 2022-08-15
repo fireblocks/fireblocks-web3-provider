@@ -47,4 +47,5 @@ export type FireblocksProviderConfig = {
   note?: string,
   pollingInterval?: number,
   oneTimeAddressesEnabled?: boolean,
+  externalTxId?: string,
 }
