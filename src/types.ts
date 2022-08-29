@@ -22,6 +22,7 @@ export enum ChainId {
   RSK_TEST = 31,
   CELO = 42220,
   CELO_BAK = 62320,
+  CELO_ALF = 44787,
   OPTIMISM = 10,
   OPTIMISM_KOVAN = 69,
   RONIN = 2020,

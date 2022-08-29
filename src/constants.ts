@@ -23,6 +23,7 @@ export const ASSETS: { [key: string]: Asset } = {
   [ChainId.RSK_TEST]: { assetId: 'RBTC_TEST', rpcUrl: "https://public-node.testnet.rsk.co" },
   [ChainId.CELO]: { assetId: 'CELO', rpcUrl: "https://rpc.ankr.com/celo" },
   [ChainId.CELO_BAK]: { assetId: 'CELO_BAK', rpcUrl: "https://baklava-blockscout.celo-testnet.org/api/eth-rpc" },
+  [ChainId.CELO_ALF]: { assetId: 'CELO_BAK', rpcUrl: "https://alfajores-forno.celo-testnet.org/api/eth-rpc" },
   [ChainId.OPTIMISM]: { assetId: 'ETH-OPT', rpcUrl: "https://rpc.ankr.com/optimism" },
   [ChainId.OPTIMISM_KOVAN]: { assetId: 'ETH-OPT_KOV', rpcUrl: "https://kovan.optimism.io/" },
   [ChainId.RONIN]: { assetId: 'RON', rpcUrl: "https://api.roninchain.com/rpc" }
