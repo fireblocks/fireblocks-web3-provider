@@ -22,6 +22,7 @@ export class FireblocksWeb3Provider extends EthereumProvider {
   private chainId?: number;
   private feeLevel: FeeLevel;
   private note: string;
+  private externalTxId: (()=>string) | string | undefined;
   private accountsPopulatedPromise: Promise<void>;
   private pollingInterval: number;
   private oneTimeAddressesEnabled: boolean;
@@ -41,6 +42,7 @@ export class FireblocksWeb3Provider extends EthereumProvider {
     this.config = config
     this.feeLevel = config.fallbackFeeLevel || FeeLevel.MEDIUM
     this.note = config.note || 'Created by Fireblocks Web3 Provider'
+    this.externalTxId = config.externalTxId;
     this.vaultAccountIds = this.parseVaultAccountIds(config.vaultAccountIds)
     this.pollingInterval = config.pollingInterval || 1000
     this.oneTimeAddressesEnabled = config.oneTimeAddressesEnabled || true
@@ -301,6 +303,7 @@ export class FireblocksWeb3Provider extends EthereumProvider {
       feeLevel: (isEip1559Fees || isLegacyFees) ? undefined : this.feeLevel,
       destination: this.getDestination(transaction.to),
       note: this.note,
+      externalTxId: !this.externalTxId ? undefined  : (typeof this.externalTxId == 'function' ? this.externalTxId() : this.externalTxId),
       amount: formatEther(transaction.value?.toString() || "0"),
       extraParameters: transaction.data ? {
         contractCallData: transaction.data
@@ -351,6 +354,7 @@ export class FireblocksWeb3Provider extends EthereumProvider {
         id: vaultAccountId.toString(),
       },
       note: this.note,
+      externalTxId: !this.externalTxId ? undefined  : (typeof this.externalTxId == 'function' ? this.externalTxId() : this.externalTxId),
       extraParameters: {
         rawMessageData: {
           messages: [message]
@@ -390,5 +394,9 @@ export class FireblocksWeb3Provider extends EthereumProvider {
 
   private getVaultAccountId(address: string): number {
     return parseInt(Object.entries(this.accounts).find(([id, addr]) => addr.toLowerCase() === address.toLowerCase())?.[0] || '');
+  }
+
+  setExternalTxId(externalTxId: (()=>string) | string | undefined){
+    this.externalTxId = externalTxId;
   }
 }
