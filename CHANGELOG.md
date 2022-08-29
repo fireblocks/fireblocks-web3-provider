@@ -2,8 +2,8 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
-#### v0.0.2
+#### v0.0.3
 
-> 7 August 2022
+> 29 August 2022
 
-- release 0.0.1-alpha.1 [`4c1626e`](https://github.com/fireblocks/fireblocks-web3-provider/commit/4c1626e91f7ad8db9c3882faeed673fb5b52fa10)
+- Added externalTxId to transaction creation (contract call \ typed message). [`#1`](https://github.com/fireblocks/fireblocks-web3-provider/pull/1)
