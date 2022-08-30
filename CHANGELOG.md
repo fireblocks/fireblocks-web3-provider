@@ -2,8 +2,8 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
-#### v0.0.3
+#### v0.0.4
 
-> 29 August 2022
+> 30 August 2022
 
-- Added externalTxId to transaction creation (contract call \ typed message). [`#1`](https://github.com/fireblocks/fireblocks-web3-provider/pull/1)
+- Fix typo [`d180e06`](https://github.com/fireblocks/fireblocks-web3-provider/commit/d180e060d105985df19c19f257e61e49e9a61e7f)
