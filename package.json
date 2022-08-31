@@ -37,7 +37,7 @@
     "README.md"
   ],
   "devDependencies": {
-    "@json-rpc-tools/provider": "^1.7.5",
+    "@json-rpc-tools/provider": "1.7.5",
     "@types/chai": "^4.3.1",
     "@types/mocha": "^9.1.1",
     "@types/web3": "^1.2.2",
