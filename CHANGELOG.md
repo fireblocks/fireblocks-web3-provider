@@ -2,8 +2,8 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
-#### v0.0.4
+#### v0.0.5
 
-> 30 August 2022
+> 31 August 2022
 
-- Fix typo [`d180e06`](https://github.com/fireblocks/fireblocks-web3-provider/commit/d180e060d105985df19c19f257e61e49e9a61e7f)
+- Pin node 16 version to 16.14.2 in build action [`0949b6d`](https://github.com/fireblocks/fireblocks-web3-provider/commit/0949b6db82a48744704f962c76418536f8b770e7)
