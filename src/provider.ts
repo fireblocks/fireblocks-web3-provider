@@ -78,7 +78,12 @@ export class FireblocksWeb3Provider extends EthereumProvider {
   private async getVaultAccounts(): Promise<number[]> {
     await this.assetAndChainIdPopulatedPromise
 
-    return (await this.fireblocksApiClient.getVaultAccounts())
+    return (await this.fireblocksApiClient.getVaultAccountsWithPageInfo(
+      {
+        assetId: this.assetId,
+        orderBy: "ASC",
+        limit: 20,
+      })).accounts
       .filter((x: any) => x.assets.some((a: any) => a.id == this.assetId))
       .map((x: any) => parseInt(x.id))
   }
@@ -267,6 +272,18 @@ export class FireblocksWeb3Provider extends EthereumProvider {
     }
   }
 
+  private getVaultAccountIdAndValidateExistence(address: string, errorMessage: string = "Account not found: ") {
+    const vaultAccountId = this.getVaultAccountId(address);
+
+    if (isNaN(vaultAccountId)) {
+      throw new Error(`${errorMessage}${address}. 
+${!this.config.vaultAccountIds ? "vaultAccountIds was not provided in the configuration. When that happens, the provider loads the first 20 vault accounts found. It is advised to explicitly pass the required vaultAccountIds in the configuration to the provider." : `vaultAccountIds provided in the configuration: ${this.vaultAccountIds!.join(", ")}`}.
+Available addresses: ${Object.values(this.accounts).join(', ')}.`);
+    }
+
+    return vaultAccountId
+  }
+
   private async createContractCall(transaction: any) {
     if (transaction.chainId && transaction.chainId != this.chainId) {
       throw new Error(`Chain ID of the transaction (${transaction.chainId}) does not match the chain ID of the FireblocksWeb3Provider (${this.chainId})`);
@@ -276,10 +293,7 @@ export class FireblocksWeb3Provider extends EthereumProvider {
       throw new Error(`Transaction sent with no "from" field`);
     }
 
-    const vaultAccountId = this.getVaultAccountId(transaction.from);
-    if (isNaN(vaultAccountId)) {
-      throw new Error(`Transaction sent from an unsupported address: ${transaction.from}. Supported addresses: ${Object.values(this.accounts).join(', ')}`);
-    }
+    const vaultAccountId = this.getVaultAccountIdAndValidateExistence(transaction.from, `Transaction sent from an unsupported address: `);
 
     const { gas, gasPrice, maxPriorityFeePerGas, maxFeePerGas } = transaction;
     const fee = formatUnits(gasPrice || 0, "gwei");
@@ -316,10 +330,7 @@ export class FireblocksWeb3Provider extends EthereumProvider {
   }
 
   private async createPersonalSign(address: string, content: any, operation: TransactionOperation, type: RawMessageType): Promise<string> {
-    const vaultAccountId = this.getVaultAccountId(address);
-    if (isNaN(vaultAccountId)) {
-      throw new Error(`Signature request from an unsupported address: ${address}. Supported addresses: ${Object.values(this.accounts).join(', ')}`);
-    }
+    const vaultAccountId = this.getVaultAccountIdAndValidateExistence(address, `Signature request from an unsupported address: `);
 
     let finalContent = content;
 
