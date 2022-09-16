@@ -251,7 +251,7 @@ export class FireblocksWeb3Provider extends EthereumProvider {
         }
       }
     } else {
-      if (!address) {
+      if (!address || address == "0x0") {
         throw new Error(`Contract deployment is currently not available without enabling one-time addresses`);
       }
 
