@@ -45,7 +45,7 @@ export class FireblocksWeb3Provider extends EthereumProvider {
     this.externalTxId = config.externalTxId;
     this.vaultAccountIds = this.parseVaultAccountIds(config.vaultAccountIds)
     this.pollingInterval = config.pollingInterval || 1000
-    this.oneTimeAddressesEnabled = config.oneTimeAddressesEnabled || true
+    this.oneTimeAddressesEnabled = config.oneTimeAddressesEnabled ?? true
     if (config.chainId) {
       this.assetId = asset.assetId
       this.chainId = config.chainId
