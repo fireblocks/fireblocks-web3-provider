@@ -1,19 +1,19 @@
-import { EthereumProvider } from "eip1193-provider";
 import util from "util";
 import {
   RequestArguments,
   formatJsonRpcRequest,
+  formatJsonRpcResult,
 } from "@json-rpc-tools/utils";
 import { DestinationTransferPeerPath, FeeLevel, FireblocksSDK, TransactionArguments, TransactionResponse, TransactionStatus } from "fireblocks-sdk";
 import { getAssetByChain } from "./utils";
 import { readFileSync } from "fs";
 import { ChainId, FireblocksProviderConfig, RawMessageType } from "./types";
 import { PeerType, TransactionOperation } from "fireblocks-sdk";
-import { formatEther, formatUnits } from "ethers/lib/utils";
+import { formatEther, formatUnits } from "@ethersproject/units";
 import { FINAL_TRANSACTION_STATES } from "./constants";
+const HttpProvider = require("web3-providers-http");
 
-
-export class FireblocksWeb3Provider extends EthereumProvider {
+export class FireblocksWeb3Provider extends HttpProvider {
   private fireblocksApiClient: FireblocksSDK;
   private config: FireblocksProviderConfig;
   private accounts: { [vaultId: number]: string } = {};
@@ -90,7 +90,7 @@ export class FireblocksWeb3Provider extends EthereumProvider {
 
   // Called by the constructor in case rpcUrl is provided, and chainId not
   private async populateAssetAndChainId() {
-    const chainId = await this.requestStrict(formatJsonRpcRequest('eth_chainId', []))
+    const chainId = (await util.promisify<any, any>(super.send).bind(this)(formatJsonRpcRequest('eth_chainId', []))).result
 
     const asset = getAssetByChain(Number(chainId))
     if (!asset) {
@@ -167,84 +167,65 @@ export class FireblocksWeb3Provider extends EthereumProvider {
     await this.whitelistedPopulatedPromise
   }
 
-  public async request(
-    args: RequestArguments
-  ): Promise<any> {
-    await this.initialized()
-
-    switch (args.method) {
-      case "eth_requestAccounts":
-      case "eth_accounts":
-        return Object.values(this.accounts);
-
-      case "eth_sendTransaction":
-        return await this.createContractCall(args.params[0]);
-
-      case "personal_sign":
-        return await this.createPersonalSign(args.params[1], args.params[0], TransactionOperation.TYPED_MESSAGE, RawMessageType.ETH_MESSAGE);
-
-      case "eth_signTypedData":
-      case "eth_signTypedData_v1":
-      case "eth_signTypedData_v3":
-      case "eth_signTypedData_v4":
-        return await this.createPersonalSign(args.params[0], args.params[1], TransactionOperation.TYPED_MESSAGE, RawMessageType.EIP712);
-
-      case "eth_signTypedData_v2":
-      case "eth_signTransaction":
-      case "eth_sign":
-        throw new Error(`JSON-RPC method (${args.method}) is not implemented in FireblocksWeb3Provider`);
-      default:
-        return await this.requestStrict(formatJsonRpcRequest(args.method, args.params || []));
-    }
-  }
-
   public send(
     payload: any,
     callback: (error: any, response: any) => void
   ): void {
-    return this.sendAsync(payload, callback);
-  }
+    (async () => {
+      let result = payload.responseText;
+      let error = null;
 
+      try {
+        await this.initialized()
+
+        switch (payload.method) {
+          case "eth_requestAccounts":
+          case "eth_accounts":
+            result = Object.values(this.accounts);
+            break;
+
+          case "eth_sendTransaction":
+            result = await this.createContractCall(payload.params[0]);
+            break;
+
+          case "personal_sign":
+            result = await this.createPersonalSign(payload.params[1], payload.params[0], TransactionOperation.TYPED_MESSAGE, RawMessageType.ETH_MESSAGE);
+            break;
+
+          case "eth_signTypedData":
+          case "eth_signTypedData_v1":
+          case "eth_signTypedData_v3":
+          case "eth_signTypedData_v4":
+            result = await this.createPersonalSign(payload.params[0], payload.params[1], TransactionOperation.TYPED_MESSAGE, RawMessageType.EIP712);
+            break;
+
+          case "eth_signTypedData_v2":
+          case "eth_signTransaction":
+          case "eth_sign":
+            throw new Error(`JSON-RPC method (${payload.method}) is not implemented in FireblocksWeb3Provider`);
+          default:
+            callback(error, await util.promisify<any, any>(super.send).bind(this)(payload))
+            return;
+        }
+      } catch (e) {
+        error = e;
+      }
+
+      callback(error, formatJsonRpcResult(payload.id, result));
+    })();
+  }
 
   public sendAsync(
     payload: any,
     callback: (error: any, response: any) => void
   ): void {
-    util.callbackify(() => this._sendJsonRpcRequest(payload))(callback);
+    this.send(payload, callback);
   }
 
-  private async _sendJsonRpcRequest(
-    request: any
+  public async request(
+    args: RequestArguments
   ): Promise<any> {
-    const response = {
-      id: request.id,
-      jsonrpc: "2.0",
-    };
-
-    try {
-      // @ts-ignore
-      response.result = await this.request({
-        method: request.method,
-        params: request.params,
-      });
-    } catch (error: any) {
-      if (error.code === undefined) {
-        // eslint-disable-next-line @nomiclabs/hardhat-internal-rules/only-hardhat-error
-        throw error;
-      }
-
-      // @ts-ignore
-      response.error = {
-        code: error.code ? +error.code : -1,
-        message: error.message,
-        data: {
-          stack: error.stack,
-          name: error.name,
-        },
-      };
-    }
-
-    return response;
+    return (await util.promisify(this.send).bind(this)(formatJsonRpcRequest(args.method, args.params))).result;
   }
 
   private getDestination(address: string): DestinationTransferPeerPath {
@@ -407,7 +388,7 @@ Available addresses: ${Object.values(this.accounts).join(', ')}.`);
     return parseInt(Object.entries(this.accounts).find(([id, addr]) => addr.toLowerCase() === address.toLowerCase())?.[0] || '');
   }
 
-  setExternalTxId(externalTxId: (() => string) | string | undefined) {
+  public setExternalTxId(externalTxId: (() => string) | string | undefined) {
     this.externalTxId = externalTxId;
   }
 }
