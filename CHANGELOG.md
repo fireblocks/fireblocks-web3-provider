@@ -2,8 +2,8 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
-#### v0.0.6
+#### v0.0.7
 
-> 16 September 2022
+> 29 September 2022
 
-- Fix oneTimeAddressesEnabled config resolution bug [`36e2a78`](https://github.com/fireblocks/fireblocks-web3-provider/commit/36e2a786ee9fc4602d7ca23d8ee097088aeb4e7c)
+- Update example snippet to use Goerli [`9f7b538`](https://github.com/fireblocks/fireblocks-web3-provider/commit/9f7b5386880b236409ebf5167678623714945a9a)
