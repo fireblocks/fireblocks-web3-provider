@@ -5,7 +5,7 @@ export const ASSETS: { [key: string]: Asset } = {
   [ChainId.MAINNET]: { assetId: 'ETH', rpcUrl: "https://cloudflare-eth.com" },
   [ChainId.ROPSTEN]: { assetId: 'ETH_TEST', rpcUrl: "https://rpc.ankr.com/eth_ropsten" },
   [ChainId.KOVAN]: { assetId: 'ETH_TEST2', rpcUrl: "https://kovan.poa.network" },
-  [ChainId.GOERLI]: { assetId: 'ETH_TEST3', rpcUrl: "https://goerli.optimism.io/" },
+  [ChainId.GOERLI]: { assetId: 'ETH_TEST3', rpcUrl: "https://rpc.ankr.com/eth_goerli" },
   [ChainId.RINKEBY]: { assetId: 'ETH_TEST4', rpcUrl: "https://rpc.ankr.com/eth_rinkeby" },
   [ChainId.BSC]: { assetId: 'BNB_BSC', rpcUrl: "https://bsc-dataseed.binance.org" },
   [ChainId.BSC_TEST]: { assetId: 'BNB_TEST', rpcUrl: "https://data-seed-prebsc-1-s1.binance.org:8545" },
