@@ -22,7 +22,7 @@ const eip1193Provider = new FireblocksWeb3Provider({
     privateKey: process.env.FIREBLOCKS_API_PRIVATE_KEY_PATH,
     apiKey: process.env.FIREBLOCKS_API_KEY,
     vaultAccountIds: process.env.FIREBLOCKS_VAULT_ACCOUNT_IDS,
-    chainId: ChainId.ROPSTEN,
+    chainId: ChainId.GOERLI,
 })
 ```
 
