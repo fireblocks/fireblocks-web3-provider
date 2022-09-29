@@ -15,6 +15,6 @@ describe("Web3: Should be able to read data from Ethereum", function () {
   it("getBlockNumber", async function () {
     const blockNumber = await provider.eth.getBlockNumber()
 
-    expect(blockNumber).to.be.greaterThan(12637637)
+    expect(blockNumber).to.be.greaterThan(10_000)
   })
 })
