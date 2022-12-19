@@ -9,6 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v2
         with:
           node-version: '16.14.2'
@@ -25,7 +27,7 @@ jobs:
           git config --global user.name "Github Actions"
           npm --no-git-tag-version --allow-same-version version $tag
           npm i -g auto-changelog
-          auto-changelog --hide-credit -l 0 -b 3
+          auto-changelog --hide-credit -l 100
           git add .
           git commit -m "release $tag"
           git push
