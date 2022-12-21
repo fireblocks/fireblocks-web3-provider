@@ -49,4 +49,5 @@ export type FireblocksProviderConfig = {
   pollingInterval?: number,
   oneTimeAddressesEnabled?: boolean,
   externalTxId?: (() => string) | string,
+  gaslessContracts?: string[] | "all",
 }

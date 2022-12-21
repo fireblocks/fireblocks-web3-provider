@@ -24,7 +24,8 @@
   "scripts": {
     "lint:fix": "prettier --write 'src/**/*.{js,ts}' 'test/**/*.{js,ts}' && tslint --fix --config tslint.json --project tsconfig.json",
     "lint": "tslint --config tslint.json --project tsconfig.json",
-    "test": "mocha --exit --recursive 'test/**/*.test.ts'",
+    "test": "mocha --exit --exclude 'test/gasless/*.test.ts' --recursive 'test/**/*.test.ts'",
+    "test:gasless": "mocha --exit --recursive 'test/gasless/*.test.ts'",
     "build": "tsc",
     "watch": "tsc -w",
     "prepublishOnly": "npm run build"
@@ -38,6 +39,7 @@
   "devDependencies": {
     "@types/chai": "4.3.1",
     "@types/mocha": "9.1.1",
+    "@types/node-fetch": "^2.6.2",
     "chai": "4.3.6",
     "ethers": "5.6.9",
     "mocha": "10.0.0",
@@ -51,7 +53,9 @@
   "dependencies": {
     "@ethersproject/units": "^5.7.0",
     "@json-rpc-tools/utils": "1.7.5",
+    "dotenv": "^16.0.3",
     "fireblocks-sdk": "2.3.1",
+    "node-fetch": "^2.6.7",
     "web3-providers-http": "1.8.0"
   }
 }

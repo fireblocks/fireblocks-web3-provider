@@ -9,8 +9,12 @@ import { getAssetByChain } from "./utils";
 import { readFileSync } from "fs";
 import { ChainId, FireblocksProviderConfig, RawMessageType } from "./types";
 import { PeerType, TransactionOperation } from "fireblocks-sdk";
-import { formatEther, formatUnits } from "@ethersproject/units";
+import { formatEther, formatUnits, parseEther } from "@ethersproject/units";
 import { FINAL_TRANSACTION_STATES } from "./constants";
+import * as ethers from "ethers";
+import NativeMetaTransactionAbi from "./abi/NativeMetaTransaction.json";
+import { _TypedDataEncoder } from "@ethersproject/hash";
+import fetch from 'node-fetch';
 const HttpProvider = require("web3-providers-http");
 
 export class FireblocksWeb3Provider extends HttpProvider {
@@ -23,6 +27,7 @@ export class FireblocksWeb3Provider extends HttpProvider {
   private feeLevel: FeeLevel;
   private note: string;
   private externalTxId: (() => string) | string | undefined;
+  private gaslessContracts: string[] | "all";
   private accountsPopulatedPromise: Promise<void>;
   private pollingInterval: number;
   private oneTimeAddressesEnabled: boolean;
@@ -43,6 +48,7 @@ export class FireblocksWeb3Provider extends HttpProvider {
     this.feeLevel = config.fallbackFeeLevel || FeeLevel.MEDIUM
     this.note = config.note || 'Created by Fireblocks Web3 Provider'
     this.externalTxId = config.externalTxId;
+    this.gaslessContracts = Array.isArray(config.gaslessContracts) ? config.gaslessContracts.map((addr: string) => addr.toLowerCase()) : config.gaslessContracts ?? [];
     this.vaultAccountIds = this.parseVaultAccountIds(config.vaultAccountIds)
     this.pollingInterval = config.pollingInterval || 1000
     this.oneTimeAddressesEnabled = config.oneTimeAddressesEnabled ?? true
@@ -185,7 +191,11 @@ export class FireblocksWeb3Provider extends HttpProvider {
             break;
 
           case "eth_sendTransaction":
-            result = await this.createContractCall(payload.params[0]);
+            if (this.gaslessContracts == "all" || this.gaslessContracts.includes(payload.params[0].to.toLowerCase())) {
+              result = this.createGaslessTransaction(payload.params[0]);
+            } else {
+              result = await this.createContractCall(payload.params[0]);
+            }
             break;
 
           case "personal_sign":
@@ -263,6 +273,76 @@ Available addresses: ${Object.values(this.accounts).join(', ')}.`);
     }
 
     return vaultAccountId
+  }
+
+  private async createGaslessTransaction(transaction: any) {
+    if (transaction.chainId && transaction.chainId != this.chainId) {
+      throw new Error(`Chain ID of the transaction (${transaction.chainId}) does not match the chain ID of the FireblocksWeb3Provider (${this.chainId})`);
+    }
+
+    if (!transaction.from) {
+      throw new Error(`Transaction sent with no "from" field`);
+    }
+
+    const { data, from, to } = transaction
+
+    const web3Provider = new ethers.providers.Web3Provider(this)
+    const NativeMetaTransactionContract = new ethers.Contract(to, NativeMetaTransactionAbi, web3Provider)
+
+    const nonce = Number(await NativeMetaTransactionContract.getNonce(from))
+    const name = await NativeMetaTransactionContract.name()
+    const version = await NativeMetaTransactionContract.ERC712_VERSION()
+
+    const req = {
+      nonce,
+      from: from,
+      functionSignature: data,
+    };
+
+    const domain = {
+      name,
+      version,
+      // @ts-ignore
+      salt: ethers.utils.hexZeroPad(this.chainId, 32),
+      verifyingContract: to,
+    }
+
+    const types = {
+      MetaTransaction: [
+        { name: 'nonce', type: 'uint256' },
+        { name: 'from', type: 'address' },
+        { name: 'functionSignature', type: 'bytes' },
+      ],
+    }
+    const signature = await web3Provider.getSigner(from)._signTypedData(
+      domain,
+      types,
+      req
+    );
+
+    const relayRequestData = {
+      type: 'NativeMetaTransaction',
+      chainId: this.chainId,
+      from,
+      to,
+      calldata: data,
+      signature,
+    }
+
+    const { txHash, success, error } = await fetch('http://localhost:7777/relayGaslessTransaction', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(relayRequestData),
+
+    }).then(res => res.json()) as any
+
+    if (!success) {
+      throw new Error(`Error received from relay server: ${error}`)
+    }
+
+    return txHash
   }
 
   private async createContractCall(transaction: any) {
