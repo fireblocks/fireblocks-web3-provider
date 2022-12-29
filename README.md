@@ -1,11 +1,6 @@
 [![npm version](https://badge.fury.io/js/@fireblocks%2Ffireblocks-web3-provider.svg)](https://badge.fury.io/js/@fireblocks%2Ffireblocks-web3-provider)
 
 # Fireblocks Web3 Provider
-> **Warning**  
-> This package is in a beta stage and should be used at your own risk.  
-> The provided interfaces might go through backwards-incompatibale changes.  
-> For a more stable library (with a different paradigm) you can use the DeFi SDK (https://github.com/fireblocks/fireblocks-defi-sdk)
-
 
 Fireblocks [EIP-1193](https://eips.ethereum.org/EIPS/eip-1193) Compatible Ethereum JavaScript Provider
 
