@@ -1,6 +1,6 @@
 {
   "name": "@fireblocks/fireblocks-web3-provider",
-  "version": "0.0.9",
+  "version": "1.0.0",
   "description": "EIP-1193 Compatible Ethereum provider for Fireblocks",
   "repository": "github:fireblocks/fireblocks-web3-provider",
   "author": "Fireblocks",
@@ -54,7 +54,7 @@
     "@ethersproject/units": "^5.7.0",
     "@json-rpc-tools/utils": "1.7.5",
     "dotenv": "^16.0.3",
-    "fireblocks-sdk": "2.3.1",
+    "fireblocks-sdk": "2.5.4",
     "node-fetch": "^2.6.7",
     "web3-providers-http": "1.8.0"
   }
