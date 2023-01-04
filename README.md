@@ -76,5 +76,8 @@ export type FireblocksProviderConfig = {
   // By default, no externalTxId is associated with transactions
   // If you want to set one, you can either provide a function that returns a string, or provide a string directly
   externalTxId?: (() => string) | string,
+  // By default, no contracts are interacted with gaslessly
+  // You can either provide a list of contract addresses, or set it to "all" to interact with all contracts gaslessly
+  gaslessContracts?: string[] | "all",
 }
 ```
