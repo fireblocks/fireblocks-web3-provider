@@ -12,9 +12,8 @@ import { PeerType, TransactionOperation } from "fireblocks-sdk";
 import { formatEther, formatUnits, parseEther } from "@ethersproject/units";
 import { FINAL_TRANSACTION_STATES } from "./constants";
 import * as ethers from "ethers";
-import NativeMetaTransactionAbi from "./abi/NativeMetaTransaction.json";
+import { NativeMetaTransaction__factory } from "./contracts/factories"
 import { _TypedDataEncoder } from "@ethersproject/hash";
-import fetch from 'node-fetch';
 const HttpProvider = require("web3-providers-http");
 
 export class FireblocksWeb3Provider extends HttpProvider {
@@ -27,13 +26,15 @@ export class FireblocksWeb3Provider extends HttpProvider {
   private feeLevel: FeeLevel;
   private note: string;
   private externalTxId: (() => string) | string | undefined;
-  private gaslessContracts: string[] | "all";
+  private gaslessGasTankVaultId?: number;
+  private gaslessGasTankVaultAddress?: string;
   private accountsPopulatedPromise: Promise<void>;
   private pollingInterval: number;
   private oneTimeAddressesEnabled: boolean;
   private whitelisted: { [address: string]: { type: string, id: string } } = {};
   private whitelistedPopulatedPromise: Promise<void>;
   private assetAndChainIdPopulatedPromise: Promise<void>;
+  private gaslessGasTankAddressPopulatedPromise: Promise<void>;
 
   constructor(config: FireblocksProviderConfig) {
     const asset = getAssetByChain(config.chainId!);
@@ -48,7 +49,7 @@ export class FireblocksWeb3Provider extends HttpProvider {
     this.feeLevel = config.fallbackFeeLevel || FeeLevel.MEDIUM
     this.note = config.note || 'Created by Fireblocks Web3 Provider'
     this.externalTxId = config.externalTxId;
-    this.gaslessContracts = Array.isArray(config.gaslessContracts) ? config.gaslessContracts.map((addr: string) => addr.toLowerCase()) : config.gaslessContracts ?? [];
+    this.gaslessGasTankVaultId = config.gaslessGasTankVaultId
     this.vaultAccountIds = this.parseVaultAccountIds(config.vaultAccountIds)
     this.pollingInterval = config.pollingInterval || 1000
     this.oneTimeAddressesEnabled = config.oneTimeAddressesEnabled ?? true
@@ -59,6 +60,7 @@ export class FireblocksWeb3Provider extends HttpProvider {
     this.assetAndChainIdPopulatedPromise = config.chainId ? Promise.resolve() : this.populateAssetAndChainId()
     this.accountsPopulatedPromise = this.populateAccounts()
     this.whitelistedPopulatedPromise = this.oneTimeAddressesEnabled ? Promise.resolve() : this.populateWhitelisted()
+    this.gaslessGasTankAddressPopulatedPromise = this.gaslessGasTankVaultId == undefined ? Promise.resolve() : this.populateGaslessGasTankAddress()
   }
 
   private parsePrivateKey(privateKey: string): string {
@@ -67,6 +69,16 @@ export class FireblocksWeb3Provider extends HttpProvider {
     } else {
       return privateKey
     }
+  }
+
+  private async populateGaslessGasTankAddress(): Promise<void> {
+    await this.assetAndChainIdPopulatedPromise
+    const depositAddresses = await this.fireblocksApiClient.getDepositAddresses(this.gaslessGasTankVaultId!.toString(), this.assetId!)
+    if (depositAddresses.length === 0) {
+      throw Error(`Gasless gas tank vault not found (vault id: ${this.gaslessGasTankVaultId})`)
+    }
+    this.gaslessGasTankVaultAddress = depositAddresses[0].address
+    this.accounts[this.gaslessGasTankVaultId!] = this.gaslessGasTankVaultAddress
   }
 
   private parseVaultAccountIds(vaultAccountIds: number | number[] | string | string[] | undefined): number[] | undefined {
@@ -168,9 +180,10 @@ export class FireblocksWeb3Provider extends HttpProvider {
   }
 
   private async initialized() {
-    await this.assetAndChainIdPopulatedPromise;
+    await this.assetAndChainIdPopulatedPromise
     await this.accountsPopulatedPromise
     await this.whitelistedPopulatedPromise
+    await this.gaslessGasTankAddressPopulatedPromise
   }
 
   public send(
@@ -189,9 +202,8 @@ export class FireblocksWeb3Provider extends HttpProvider {
           case "eth_accounts":
             result = Object.values(this.accounts);
             break;
-
           case "eth_sendTransaction":
-            if (this.gaslessContracts == "all" || this.gaslessContracts.includes(payload.params[0].to.toLowerCase())) {
+            if (this.gaslessGasTankVaultId != undefined && payload.params[0].from.toLowerCase() != this.gaslessGasTankVaultAddress!.toLowerCase()) {
               result = this.createGaslessTransaction(payload.params[0]);
             } else {
               result = await this.createContractCall(payload.params[0]);
@@ -286,8 +298,8 @@ Available addresses: ${Object.values(this.accounts).join(', ')}.`);
 
     const { data, from, to } = transaction
 
-    const web3Provider = new ethers.providers.Web3Provider(this)
-    const NativeMetaTransactionContract = new ethers.Contract(to, NativeMetaTransactionAbi, web3Provider)
+    const ethersProvider = new ethers.providers.Web3Provider(this)
+    const NativeMetaTransactionContract = NativeMetaTransaction__factory.connect(to, ethersProvider.getSigner(this.gaslessGasTankVaultAddress))
 
     const nonce = Number(await NativeMetaTransactionContract.getNonce(from))
     const name = await NativeMetaTransactionContract.name()
@@ -314,35 +326,15 @@ Available addresses: ${Object.values(this.accounts).join(', ')}.`);
         { name: 'functionSignature', type: 'bytes' },
       ],
     }
-    const signature = await web3Provider.getSigner(from)._signTypedData(
+    const signature = ethers.utils.splitSignature(await ethersProvider.getSigner(from)._signTypedData(
       domain,
       types,
       req
-    );
+    ));
 
-    const relayRequestData = {
-      type: 'NativeMetaTransaction',
-      chainId: this.chainId,
-      from,
-      to,
-      calldata: data,
-      signature,
-    }
+    const relayedTx = await NativeMetaTransactionContract.executeMetaTransaction(from, data, signature.r, signature.s, signature.v)
 
-    const { txHash, success, error } = await fetch('http://localhost:7777/relayGaslessTransaction', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(relayRequestData),
-
-    }).then(res => res.json()) as any
-
-    if (!success) {
-      throw new Error(`Error received from relay server: ${error}`)
-    }
-
-    return txHash
+    return relayedTx.hash
   }
 
   private async createContractCall(transaction: any) {
