@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v1.0.1](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.0.0...v1.0.1)
+
+> 1 January 2023
+
+- Bump jsonwebtoken and fireblocks-sdk [`#3`](https://github.com/fireblocks/fireblocks-web3-provider/pull/3)
+- release 1.0.0 [`727dfff`](https://github.com/fireblocks/fireblocks-web3-provider/commit/727dfff0a71c656e3dc51a2919883ea5d34e6156)
+
 ### [v1.0.0](https://github.com/fireblocks/fireblocks-web3-provider/compare/v0.0.9...v1.0.0)
 
 > 29 December 2022
