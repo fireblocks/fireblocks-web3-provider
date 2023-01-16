@@ -1,3 +1,5 @@
+import * as dotenv from 'dotenv'
+dotenv.config()
 import * as ethers from "ethers"
 import { FireblocksWeb3Provider, ChainId } from "../src"
 import Web3 from "web3";
