@@ -176,11 +176,10 @@ export class FireblocksWeb3Provider extends HttpProvider {
       let error = null;
 
       try {
-        await this.initialized()
-
         switch (payload.method) {
           case "eth_requestAccounts":
           case "eth_accounts":
+            await this.accountsPopulatedPromise
             result = Object.values(this.accounts);
             break;
 
@@ -266,6 +265,7 @@ Available addresses: ${Object.values(this.accounts).join(', ')}.`);
   }
 
   private async createContractCall(transaction: any) {
+    await this.initialized()
     if (transaction.chainId && transaction.chainId != this.chainId) {
       throw new Error(`Chain ID of the transaction (${transaction.chainId}) does not match the chain ID of the FireblocksWeb3Provider (${this.chainId})`);
     }
@@ -311,6 +311,7 @@ Available addresses: ${Object.values(this.accounts).join(', ')}.`);
   }
 
   private async createPersonalSign(address: string, content: any, operation: TransactionOperation, type: RawMessageType): Promise<string> {
+    await this.initialized()
     const vaultAccountId = this.getVaultAccountIdAndValidateExistence(address, `Signature request from an unsupported address: `);
 
     let finalContent = content;
