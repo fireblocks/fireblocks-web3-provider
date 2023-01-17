@@ -188,6 +188,7 @@ export class FireblocksWeb3Provider extends HttpProvider {
             break;
 
           case "personal_sign":
+          case "eth_sign":
             result = await this.createPersonalSign(payload.params[1], payload.params[0], TransactionOperation.TYPED_MESSAGE, RawMessageType.ETH_MESSAGE);
             break;
 
@@ -200,7 +201,6 @@ export class FireblocksWeb3Provider extends HttpProvider {
 
           case "eth_signTypedData_v2":
           case "eth_signTransaction":
-          case "eth_sign":
             throw new Error(`JSON-RPC method (${payload.method}) is not implemented in FireblocksWeb3Provider`);
           default:
             callback(error, await util.promisify<any, any>(super.send).bind(this)(payload))
