@@ -47,5 +47,13 @@ export const FINAL_TRANSACTION_STATES = [
   TransactionStatus.FAILED,
   TransactionStatus.CANCELLED,
   TransactionStatus.BLOCKED,
-  TransactionStatus.REJECTED
+  TransactionStatus.REJECTED,
+  TransactionStatus.BROADCASTING,
+  TransactionStatus.CONFIRMING,
+]
+
+export const FINAL_SUCCESSFUL_TRANSACTION_STATES = [
+  TransactionStatus.COMPLETED,
+  TransactionStatus.BROADCASTING,
+  TransactionStatus.CONFIRMING,
 ]
