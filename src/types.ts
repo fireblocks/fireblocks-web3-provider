@@ -69,3 +69,8 @@ export type FireblocksProviderConfig = {
   // If you want to set one, you can either provide a function that returns a string, or provide a string directly
   externalTxId?: (() => string) | string,
 }
+
+export interface RequestArguments<T = any> {
+  method: string;
+  params?: T;
+}
