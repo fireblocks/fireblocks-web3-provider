@@ -50,7 +50,6 @@
   },
   "dependencies": {
     "@ethersproject/units": "^5.7.0",
-    "@json-rpc-tools/utils": "1.7.5",
     "fireblocks-sdk": "2.5.4",
     "web3-providers-http": "1.8.0"
   }

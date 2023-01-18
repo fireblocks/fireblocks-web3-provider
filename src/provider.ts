@@ -1,16 +1,12 @@
 import util from "util";
-import {
-  RequestArguments,
-  formatJsonRpcRequest,
-  formatJsonRpcResult,
-} from "@json-rpc-tools/utils";
 import { DestinationTransferPeerPath, FeeLevel, FireblocksSDK, TransactionArguments, TransactionResponse, TransactionStatus } from "fireblocks-sdk";
 import { getAssetByChain } from "./utils";
 import { readFileSync } from "fs";
-import { ChainId, FireblocksProviderConfig, RawMessageType } from "./types";
+import { ChainId, FireblocksProviderConfig, RawMessageType, RequestArguments } from "./types";
 import { PeerType, TransactionOperation } from "fireblocks-sdk";
 import { formatEther, formatUnits } from "@ethersproject/units";
 import { FINAL_TRANSACTION_STATES } from "./constants";
+import { formatJsonRpcRequest, formatJsonRpcResult } from "./jsonRpcUtils";
 const HttpProvider = require("web3-providers-http");
 
 export class FireblocksWeb3Provider extends HttpProvider {
