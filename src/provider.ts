@@ -5,7 +5,7 @@ import { readFileSync } from "fs";
 import { ChainId, FireblocksProviderConfig, RawMessageType, RequestArguments } from "./types";
 import { PeerType, TransactionOperation } from "fireblocks-sdk";
 import { formatEther, formatUnits } from "@ethersproject/units";
-import { FINAL_TRANSACTION_STATES } from "./constants";
+import { FINAL_SUCCESSFUL_TRANSACTION_STATES, FINAL_TRANSACTION_STATES } from "./constants";
 import { formatJsonRpcRequest, formatJsonRpcResult } from "./jsonRpcUtils";
 const HttpProvider = require("web3-providers-http");
 
@@ -374,8 +374,8 @@ Available addresses: ${Object.values(this.accounts).join(', ')}.`);
       await new Promise(r => setTimeout(r, this.pollingInterval));
     }
 
-    if (currentStatus != TransactionStatus.COMPLETED) {
-      throw new Error(`Transaction was not completed successfully. Final Status: ${currentStatus}`);
+    if (!FINAL_SUCCESSFUL_TRANSACTION_STATES.includes(currentStatus)) {
+      throw new Error(`Transaction was not completed successfully. Final Status: ${currentStatus} (${txInfo!?.subStatus || ''})`);
     }
 
     return txInfo!
