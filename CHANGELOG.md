@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v1.0.2](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.0.1...v1.0.2)
+
+> 22 January 2023
+
+- Upgrade web3 [`181fd28`](https://github.com/fireblocks/fireblocks-web3-provider/commit/181fd28d950f6b1cbc9bced6b2a29b8a2e96f001)
+- Use TSDoc notation [`e1184ef`](https://github.com/fireblocks/fireblocks-web3-provider/commit/e1184ef1a3f97cb8d505c2369ff3d9f4eaa80d91)
+- Update fireblocks-sdk to 3.1.3 [`fd1f5f4`](https://github.com/fireblocks/fireblocks-web3-provider/commit/fd1f5f49d1af00b602db934c77cd7d1153578cc9)
+
 #### [v1.0.1](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.0.0...v1.0.1)
 
 > 1 January 2023
