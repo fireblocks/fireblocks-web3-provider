@@ -7,6 +7,7 @@ import { PeerType, TransactionOperation } from "fireblocks-sdk";
 import { formatEther, formatUnits } from "@ethersproject/units";
 import { FINAL_SUCCESSFUL_TRANSACTION_STATES, FINAL_TRANSACTION_STATES } from "./constants";
 import { formatJsonRpcRequest, formatJsonRpcResult } from "./jsonRpcUtils";
+import { version as SDK_VERSION } from "../package.json";
 const HttpProvider = require("web3-providers-http");
 
 export class FireblocksWeb3Provider extends HttpProvider {
@@ -34,8 +35,10 @@ export class FireblocksWeb3Provider extends HttpProvider {
 
     super(config.rpcUrl || asset.rpcUrl)
 
-    this.fireblocksApiClient = new FireblocksSDK(this.parsePrivateKey(config.privateKey), config.apiKey)
     this.config = config
+    this.fireblocksApiClient = new FireblocksSDK(this.parsePrivateKey(config.privateKey), config.apiKey, undefined, undefined, {
+      userAgent: this.getUserAgent(),
+    })
     this.feeLevel = config.fallbackFeeLevel || FeeLevel.MEDIUM
     this.note = config.note || 'Created by Fireblocks Web3 Provider'
     this.externalTxId = config.externalTxId;
@@ -69,6 +72,14 @@ export class FireblocksWeb3Provider extends HttpProvider {
     } else {
       return vaultAccountIds
     }
+  }
+
+  private getUserAgent(): string {
+    let userAgent = `fireblocks-web3-provider/${SDK_VERSION}`;
+    if (this.config.userAgent) {
+      userAgent = `${this.config.userAgent} ${userAgent}`;
+    }
+    return userAgent;
   }
 
   private async getVaultAccounts(): Promise<number[]> {
