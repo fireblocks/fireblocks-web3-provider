@@ -39,36 +39,65 @@ export enum RawMessageType {
 }
 
 export type FireblocksProviderConfig = {
-  // # Mandatory fields
+  // ------------- Mandatory fields -------------
+  /** 
+   * Learn more about creating API users here: 
+   * https://developers.fireblocks.com/docs/quickstart#api-user-creation
+   */
 
-  // Learn more about creating API users here: 
-  // https://support.fireblocks.io/hc/en-us/articles/4407823826194-Adding-new-API-users
+  /** 
+   * Fireblocks API key
+   */
   apiKey: string,
-  privateKey: string,
-  
-  // Either chainId or rpcUrl must be provided
-  chainId?: ChainId, // If not provided, it is inferred from the rpcUrl
-  rpcUrl?: string, // If not provided, it is inferred from the chainId
-  
-  // # Optional fields
 
-  // By default, the first 20 vault accounts are dynamically loaded from the Fireblocks API
-  // It is recommended to provide the vault account ids explicitly because it helps avoid unnecessary API calls
+  /** 
+   * Fireblocks API private key for signing requests
+   */
+  privateKey: string,
+
+  // Either chainId or rpcUrl must be provided
+  /** 
+   * If not provided, it is inferred from the rpcUrl 
+   */
+  chainId?: ChainId,
+  /** 
+   * If not provided, it is inferred from the chainId 
+   */
+  rpcUrl?: string,
+
+  // ------------- Optional fields --------------
+
+  /** 
+   * By default, the first 20 vault accounts are dynamically loaded from the Fireblocks API
+   * It is recommended to provide the vault account ids explicitly because it helps avoid unnecessary API calls
+   */
   vaultAccountIds?: number | number[] | string | string[],
-  // By default, the fallback fee level is set to FeeLevel.MEDIUM
+  /**
+   * By default, the fallback fee level is set to FeeLevel.MEDIUM
+   */
   fallbackFeeLevel?: FeeLevel,
-  // By default, the note is set to "Created by Fireblocks Web3 Provider"
+  /**
+   * By default, the note is set to "Created by Fireblocks Web3 Provider"
+   */
   note?: string,
-  // By default, the polling interval is set to 1000ms (1 second)
-  // It is the interval in which the Fireblocks API is queried to check the status of transactions
+  /**
+   * By default, the polling interval is set to 1000ms (1 second)
+   * It is the interval in which the Fireblocks API is queried to check the status of transactions
+   */
   pollingInterval?: number,
-  // By default, it is assumed that one time addresses are enabled in your workspace
-  // If they're not, set this to false
+  /**
+   * By default, it is assumed that one time addresses are enabled in your workspace
+   * If they're not, set this to false
+   */
   oneTimeAddressesEnabled?: boolean,
-  // By default, no externalTxId is associated with transactions
-  // If you want to set one, you can either provide a function that returns a string, or provide a string directly
+  /**
+   * By default, no externalTxId is associated with transactions
+   * If you want to set one, you can either provide a function that returns a string, or provide a string directly
+   */
   externalTxId?: (() => string) | string,
-  // If you want to add additional text to the User-Agent header, you can provide it here
+  /**
+   * If you want to prepend an additional product string to the User-Agent header, you can provide it here
+   */
   userAgent?: string,
 }
 
