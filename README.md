@@ -76,5 +76,7 @@ export type FireblocksProviderConfig = {
   // By default, no externalTxId is associated with transactions
   // If you want to set one, you can either provide a function that returns a string, or provide a string directly
   externalTxId?: (() => string) | string,
+  // If you want to prepend an additional product string to the User-Agent header, you can provide it here
+  userAgent?: string,
 }
 ```
