@@ -107,5 +107,9 @@ type FireblocksProviderConfig = {
    * If you want to prepend an additional product string to the User-Agent header, you can provide it here
    */
   userAgent?: string,
+  /**
+   * If you are using a private/custom EVM chain, you can provide its Fireblocks assetId here
+   */
+  assetId?: string,
 }
 ```
