@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v1.1.0](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.0.2...v1.1.0)
+
+> 7 February 2023
+
+- Add `assetId` config to support private blockchains [`#6`](https://github.com/fireblocks/fireblocks-web3-provider/pull/6)
+- release 1.0.2 [`ca145ef`](https://github.com/fireblocks/fireblocks-web3-provider/commit/ca145efab2be40ecf965d5c5d12861a910f78739)
+- Upgrade http-cache-semantics [`b6b3707`](https://github.com/fireblocks/fireblocks-web3-provider/commit/b6b37070d68b9682143b58dd6ccec09a846b6acc)
+
 #### [v1.0.2](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.0.1...v1.0.2)
 
 > 22 January 2023
