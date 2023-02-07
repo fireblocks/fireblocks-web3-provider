@@ -28,7 +28,13 @@ export class FireblocksWeb3Provider extends HttpProvider {
   private assetAndChainIdPopulatedPromise: Promise<void>;
 
   constructor(config: FireblocksProviderConfig) {
-    const asset = getAssetByChain(config.chainId!);
+    if (config.assetId && !config.rpcUrl) {
+      throw Error(`If you supply an assetId, you must also supply an rpcUrl`);
+    }
+    const asset = config.assetId ? {
+      assetId: config.assetId,
+      rpcUrl: config.rpcUrl,
+    } : getAssetByChain(config.chainId!);
     if (!asset && !config.rpcUrl) {
       throw Error(`Unsupported chain id: ${config.chainId}. Supported chains ids: ${Object.keys(ChainId).join(', ')}`);
     }
@@ -45,11 +51,9 @@ export class FireblocksWeb3Provider extends HttpProvider {
     this.vaultAccountIds = this.parseVaultAccountIds(config.vaultAccountIds)
     this.pollingInterval = config.pollingInterval || 1000
     this.oneTimeAddressesEnabled = config.oneTimeAddressesEnabled ?? true
-    if (config.chainId) {
-      this.assetId = asset.assetId
-      this.chainId = config.chainId
-    }
-    this.assetAndChainIdPopulatedPromise = config.chainId ? Promise.resolve() : this.populateAssetAndChainId()
+    this.chainId = config.chainId
+    this.assetId = asset.assetId
+    this.assetAndChainIdPopulatedPromise = this.chainId ? Promise.resolve() : this.populateAssetAndChainId()
     this.accountsPopulatedPromise = this.populateAccounts()
     this.whitelistedPopulatedPromise = this.oneTimeAddressesEnabled ? Promise.resolve() : this.populateWhitelisted()
   }
@@ -98,14 +102,16 @@ export class FireblocksWeb3Provider extends HttpProvider {
   // Called by the constructor in case rpcUrl is provided, and chainId not
   private async populateAssetAndChainId() {
     const chainId = (await util.promisify<any, any>(super.send).bind(this)(formatJsonRpcRequest('eth_chainId', []))).result
-
-    const asset = getAssetByChain(Number(chainId))
-    if (!asset) {
-      throw Error(`Unsupported chain id: ${chainId}. Supported chains ids: ${Object.keys(ChainId).join(', ')}`)
-    }
-
-    this.assetId = asset.assetId
     this.chainId = Number(chainId)
+
+    if (!this.assetId) {
+      const asset = getAssetByChain(Number(chainId))
+      if (!asset) {
+        throw Error(`Unsupported chain id: ${chainId}. Supported chains ids: ${Object.keys(ChainId).join(', ')}`)
+      }
+
+      this.assetId = asset.assetId
+    }
   }
 
   private async populateAccounts() {

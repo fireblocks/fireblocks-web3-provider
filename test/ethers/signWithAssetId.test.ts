@@ -1,0 +1,33 @@
+import { expect } from "chai"
+import * as ethers from "ethers"
+import { getEthersFireblocksProviderForTesting } from "../utils"
+
+const provider = getEthersFireblocksProviderForTesting({
+  assetId: "ETH_TEST3",
+  rpcUrl: "https://rpc.ankr.com/eth_goerli",
+  chainId: undefined,
+})
+
+describe("Ethers: Should be able to sign using Fireblocks (with assetId configured)", function () {
+  this.timeout(60_000)
+
+  it("signMessage", async function () {
+    const signer = await provider.getSigner();
+    const message = "hello world"
+
+    const signature = await signer.signMessage(message)
+
+    const expectedSignerAddress = await signer.getAddress();
+    const recoveredAddress = ethers.utils.verifyMessage(message, signature);
+
+    expect(recoveredAddress).to.be.equals(expectedSignerAddress)
+  })
+
+  it("getChainId", async function () {
+    const signer = await provider.getSigner();
+
+    const chainId = await signer.getChainId()
+
+    expect(chainId).to.be.equals(5)
+  })
+})
