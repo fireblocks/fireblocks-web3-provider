@@ -36,7 +36,7 @@ export class FireblocksWeb3Provider extends HttpProvider {
       rpcUrl: config.rpcUrl,
     } : getAssetByChain(config.chainId!);
     if (!asset && !config.rpcUrl) {
-      throw Error(`Unsupported chain id: ${config.chainId}. Supported chains ids: ${Object.keys(ChainId).join(', ')}`);
+      throw Error(`Unsupported chain id: ${config.chainId}.\nSupported chains ids: ${Object.keys(ChainId).join(', ')}\nIf you're using a private blockchain, you can specify the blockchain's Fireblocks Asset ID via the "assetId" config param.`);
     }
 
     super(config.rpcUrl || asset.rpcUrl)
@@ -52,7 +52,7 @@ export class FireblocksWeb3Provider extends HttpProvider {
     this.pollingInterval = config.pollingInterval || 1000
     this.oneTimeAddressesEnabled = config.oneTimeAddressesEnabled ?? true
     this.chainId = config.chainId
-    this.assetId = asset.assetId
+    this.assetId = asset?.assetId
     this.assetAndChainIdPopulatedPromise = this.chainId ? Promise.resolve() : this.populateAssetAndChainId()
     this.accountsPopulatedPromise = this.populateAccounts()
     this.whitelistedPopulatedPromise = this.oneTimeAddressesEnabled ? Promise.resolve() : this.populateWhitelisted()
@@ -107,7 +107,7 @@ export class FireblocksWeb3Provider extends HttpProvider {
     if (!this.assetId) {
       const asset = getAssetByChain(Number(chainId))
       if (!asset) {
-        throw Error(`Unsupported chain id: ${chainId}. Supported chains ids: ${Object.keys(ChainId).join(', ')}`)
+        throw Error(`Unsupported chain id: ${chainId}.\nSupported chains ids: ${Object.keys(ChainId).join(', ')}\nIf you're using a private blockchain, you can specify the blockchain's Fireblocks Asset ID via the "assetId" config param.`)
       }
 
       this.assetId = asset.assetId
