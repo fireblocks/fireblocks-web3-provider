@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v1.1.1](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.1.0...v1.1.1)
+
+> 7 February 2023
+
+- release 1.1.0 [`780eb7e`](https://github.com/fireblocks/fireblocks-web3-provider/commit/780eb7eda1f9a45bd23332c2340e0b61545e79f8)
+- Improved error message for assetId [`ffec2a4`](https://github.com/fireblocks/fireblocks-web3-provider/commit/ffec2a405999b665449e54ddb6a0c4dacec27ab1)
+
 #### [v1.1.0](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.0.2...v1.1.0)
 
 > 7 February 2023
