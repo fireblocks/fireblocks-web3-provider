@@ -2,7 +2,7 @@ import util from "util";
 import { DestinationTransferPeerPath, FeeLevel, FireblocksSDK, TransactionArguments, TransactionResponse, TransactionStatus } from "fireblocks-sdk";
 import { getAssetByChain } from "./utils";
 import { readFileSync } from "fs";
-import { ChainId, FireblocksProviderConfig, RawMessageType, RequestArguments } from "./types";
+import { ChainId, FireblocksProviderConfig, ProviderRpcError, RawMessageType, RequestArguments } from "./types";
 import { PeerType, TransactionOperation } from "fireblocks-sdk";
 import { formatEther, formatUnits } from "@ethersproject/units";
 import { FINAL_SUCCESSFUL_TRANSACTION_STATES, FINAL_TRANSACTION_STATES } from "./constants";
@@ -129,7 +129,9 @@ export class FireblocksWeb3Provider extends HttpProvider {
       try {
         const depositAddresses = await this.fireblocksApiClient.getDepositAddresses(vaultAccountId.toString(), this.assetId!);
         this.accounts[vaultAccountId] = depositAddresses[0].address;
-      } catch {
+      } catch (e) {
+        console.log(e)
+        console.log(JSON.stringify(e,null,4))
         if (this.config.vaultAccountIds !== undefined) {
           throw new Error(`Failed to find Fireblocks vault account ${vaultAccountId}`);
         }
@@ -185,7 +187,7 @@ export class FireblocksWeb3Provider extends HttpProvider {
     callback: (error: any, response: any) => void
   ): void {
     (async () => {
-      let result = payload.responseText;
+      let result;
       let error = null;
 
       try {
@@ -214,10 +216,26 @@ export class FireblocksWeb3Provider extends HttpProvider {
 
           case "eth_signTypedData_v2":
           case "eth_signTransaction":
-            throw new Error(`JSON-RPC method (${payload.method}) is not implemented in FireblocksWeb3Provider`);
+            throw this.createError({
+              message: `JSON-RPC method (${payload.method}) is not implemented in FireblocksWeb3Provider`,
+              code: 4200,
+              payload,
+            })
+
           default:
-            callback(error, await util.promisify<any, any>(super.send).bind(this)(payload))
-            return;
+            const jsonRpcResponse = await util.promisify<any, any>(super.send).bind(this)(payload)
+
+            if (jsonRpcResponse.error) {
+              console.log(jsonRpcResponse)
+              throw this.createError({
+                message: jsonRpcResponse.error.message,
+                code: jsonRpcResponse.error.code,
+                data: jsonRpcResponse.error.data,
+                payload,
+              })
+            }
+
+            return callback(error, jsonRpcResponse)
         }
       } catch (e) {
         error = e;
@@ -225,6 +243,14 @@ export class FireblocksWeb3Provider extends HttpProvider {
 
       callback(error, formatJsonRpcResult(payload.id, result));
     })();
+  }
+
+  private createError(errorData: { message: string, code: number, data?: any, payload?: any }): ProviderRpcError {
+    const error = new Error(errorData.message) as ProviderRpcError
+    error.code = errorData.code
+    error.data = errorData.data
+    error.payload = errorData.payload
+    return error
   }
 
   public sendAsync(

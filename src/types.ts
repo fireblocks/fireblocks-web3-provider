@@ -114,3 +114,9 @@ export interface RequestArguments<T = any> {
   method: string;
   params?: T;
 }
+
+export interface ProviderRpcError extends Error {
+  code: number;
+  data?: unknown;
+  payload: RequestArguments;
+}
