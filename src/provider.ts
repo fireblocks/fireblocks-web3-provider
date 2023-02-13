@@ -379,11 +379,15 @@ Available addresses: ${Object.values(this.accounts).join(', ')}.`);
     const { id } = await this.fireblocksApiClient.createTransaction(transactionArguments);
 
     let txInfo: TransactionResponse;
-    let currentStatus: TransactionStatus = TransactionStatus.QUEUED;
+    let currentStatus: TransactionStatus = TransactionStatus.SUBMITTED;
 
     while (!FINAL_TRANSACTION_STATES.includes(currentStatus)) {
       try {
         txInfo = await this.fireblocksApiClient.getTransactionById(id);
+
+        if (this.config.logTransactionStatusChanges && currentStatus != txInfo.status) {
+          console.log(`Fireblocks transaction ${txInfo.id} changed status from ${currentStatus} to ${txInfo.status} ${txInfo.subStatus ? `(${txInfo.subStatus})` : ''}`)
+        }
         currentStatus = txInfo.status;
       } catch (err) {
         console.log("error:", err);
@@ -392,7 +396,7 @@ Available addresses: ${Object.values(this.accounts).join(', ')}.`);
     }
 
     if (!FINAL_SUCCESSFUL_TRANSACTION_STATES.includes(currentStatus)) {
-      throw new Error(`Transaction was not completed successfully. Final Status: ${currentStatus} (${txInfo!?.subStatus || ''})`);
+      throw new Error(`Transaction was not completed successfully. Final Status: ${currentStatus} ${txInfo!?.subStatus ? `(${txInfo!?.subStatus})` : ''}`);
     }
 
     return txInfo!

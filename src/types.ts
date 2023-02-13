@@ -103,6 +103,11 @@ export type FireblocksProviderConfig = {
    * If you are using a private/custom EVM chain, you can provide its Fireblocks assetId here
    */
   assetId?: string,
+  /**
+   * Default: false
+   * By setting to true, every transaction status change will be logged to the console
+   */
+  logTransactionStatusChanges?: boolean,
 }
 
 export interface RequestArguments<T = any> {
