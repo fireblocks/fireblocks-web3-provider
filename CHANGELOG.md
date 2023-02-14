@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v1.1.2](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.1.1...v1.1.2)
+
+> 14 February 2023
+
+- EIP-1193 Compliant Error Handling [`9b122d2`](https://github.com/fireblocks/fireblocks-web3-provider/commit/9b122d287d2b94abe025d3cc223bb1d71dc52a81)
+- Update ethers [`ddefe88`](https://github.com/fireblocks/fireblocks-web3-provider/commit/ddefe889c1ca3d9853d12544e8e9b8b7f900dab1)
+- Better error handling [`22241ff`](https://github.com/fireblocks/fireblocks-web3-provider/commit/22241ffcd8f4028aa16ea06c20a4017be095eacd)
+
 #### [v1.1.1](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.1.0...v1.1.1)
 
 > 7 February 2023
