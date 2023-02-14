@@ -107,7 +107,7 @@ export class FireblocksWeb3Provider extends HttpProvider {
     if (!this.assetId) {
       const asset = getAssetByChain(Number(chainId))
       if (!asset) {
-        throw Error(`Unsupported chain id: ${chainId}.\nSupported chains ids: ${Object.keys(ChainId).join(', ')}\nIf you're using a private blockchain, you can specify the blockchain's Fireblocks Asset ID via the "assetId" config param.`)
+        throw this.createError({ message: `Unsupported chain id: ${chainId}.\nSupported chains ids: ${Object.keys(ChainId).join(', ')}\nIf you're using a private blockchain, you can specify the blockchain's Fireblocks Asset ID via the "assetId" config param.` })
       }
 
       this.assetId = asset.assetId
@@ -116,7 +116,7 @@ export class FireblocksWeb3Provider extends HttpProvider {
 
   private async populateAccounts() {
     if (Object.keys(this.accounts).length > 0) {
-      throw new Error("Accounts already populated");
+      throw this.createError({ message: "Accounts already populated" })
     }
 
     if (!this.vaultAccountIds) {
@@ -129,14 +129,20 @@ export class FireblocksWeb3Provider extends HttpProvider {
       try {
         const depositAddresses = await this.fireblocksApiClient.getDepositAddresses(vaultAccountId.toString(), this.assetId!);
         this.accounts[vaultAccountId] = depositAddresses[0].address;
-      } catch (e) {
-        console.log(e)
-        console.log(JSON.stringify(e,null,4))
-        if (this.config.vaultAccountIds !== undefined) {
-          throw new Error(`Failed to find Fireblocks vault account ${vaultAccountId}`);
-        }
+      } catch (e: any) {
+        throw this.createFireblocksError(e)
       }
     }
+  }
+
+  private createFireblocksError(e: any) {
+    const code = e?.response?.status == 401 ? 4100 : undefined
+    let message = e?.response?.data?.message || e?.message || 'Unknown error'
+    message = `Fireblocks SDK Error: ${message}`
+    message = e?.response?.data?.code ? `${message} (Error code: ${e.response.data.code})` : message
+    message = e?.response?.headers?.['x-request-id'] ? `${message} (Request ID: ${e.response.headers['x-request-id']})` : message
+
+    return this.createError({ message, code })
   }
 
   private async getWhitelistedWallets(walletsPromise: Promise<any>, type: PeerType, assetId: string) {
@@ -150,7 +156,9 @@ export class FireblocksWeb3Provider extends HttpProvider {
 
   private async populateWhitelisted() {
     if (Object.keys(this.whitelisted).length > 0) {
-      throw new Error("Whitelisted already populated");
+
+      throw this.createError({ message: "Whitelisted already populated" })
+
     }
 
     await this.assetAndChainIdPopulatedPromise
@@ -245,9 +253,9 @@ export class FireblocksWeb3Provider extends HttpProvider {
     })();
   }
 
-  private createError(errorData: { message: string, code: number, data?: any, payload?: any }): ProviderRpcError {
+  private createError(errorData: { message: string, code?: number, data?: any, payload?: any }): ProviderRpcError {
     const error = new Error(errorData.message) as ProviderRpcError
-    error.code = errorData.code
+    error.code = errorData.code || -32603
     error.data = errorData.data
     error.payload = errorData.payload
     return error
@@ -276,17 +284,17 @@ export class FireblocksWeb3Provider extends HttpProvider {
       }
     } else {
       if (!address || address == "0x0") {
-        throw new Error(`Contract deployment is currently not available without enabling one-time addresses`);
+        throw this.createError({ message: "Contract deployment is currently not available without enabling one-time addresses" })
       }
 
-      const whitelistedDesination = this.whitelisted[address.toLowerCase()]
-      if (!whitelistedDesination) {
-        throw new Error(`Address ${address} is not whitelisted. Whitelisted addresses: ${JSON.stringify(this.whitelisted, undefined, 4)}`)
+      const whitelistedDestination = this.whitelisted[address.toLowerCase()]
+      if (!whitelistedDestination) {
+        throw this.createError({ message: `Address ${address} is not whitelisted. Whitelisted addresses: ${JSON.stringify(this.whitelisted, undefined, 4)}` })
       }
 
       return {
-        type: whitelistedDesination.type as PeerType,
-        id: whitelistedDesination.id,
+        type: whitelistedDestination.type as PeerType,
+        id: whitelistedDestination.id,
       }
     }
   }
@@ -295,9 +303,11 @@ export class FireblocksWeb3Provider extends HttpProvider {
     const vaultAccountId = this.getVaultAccountId(address);
 
     if (isNaN(vaultAccountId)) {
-      throw new Error(`${errorMessage}${address}. 
+      throw this.createError({
+        message: `${errorMessage}${address}. 
 ${!this.config.vaultAccountIds ? "vaultAccountIds was not provided in the configuration. When that happens, the provider loads the first 20 vault accounts found. It is advised to explicitly pass the required vaultAccountIds in the configuration to the provider." : `vaultAccountIds provided in the configuration: ${this.vaultAccountIds!.join(", ")}`}.
-Available addresses: ${Object.values(this.accounts).join(', ')}.`);
+Available addresses: ${Object.values(this.accounts).join(', ')}.`
+      })
     }
 
     return vaultAccountId
@@ -306,11 +316,11 @@ Available addresses: ${Object.values(this.accounts).join(', ')}.`);
   private async createContractCall(transaction: any) {
     await this.initialized()
     if (transaction.chainId && transaction.chainId != this.chainId) {
-      throw new Error(`Chain ID of the transaction (${transaction.chainId}) does not match the chain ID of the FireblocksWeb3Provider (${this.chainId})`);
+      throw this.createError({ message: `Chain ID of the transaction (${transaction.chainId}) does not match the chain ID of the FireblocksWeb3Provider (${this.chainId})` })
     }
 
     if (!transaction.from) {
-      throw new Error(`Transaction sent with no "from" field`);
+      throw this.createError({ message: `Transaction sent with no "from" field` })
     }
 
     const vaultAccountId = this.getVaultAccountIdAndValidateExistence(transaction.from, `Transaction sent from an unsupported address: `);
@@ -416,13 +426,13 @@ Available addresses: ${Object.values(this.accounts).join(', ')}.`);
         }
         currentStatus = txInfo.status;
       } catch (err) {
-        console.log("error:", err);
+        console.error(this.createFireblocksError(err));
       }
       await new Promise(r => setTimeout(r, this.pollingInterval));
     }
 
     if (!FINAL_SUCCESSFUL_TRANSACTION_STATES.includes(currentStatus)) {
-      throw new Error(`Transaction was not completed successfully. Final Status: ${currentStatus} ${txInfo!?.subStatus ? `(${txInfo!?.subStatus})` : ''}`);
+      throw this.createError({ message: `Fireblocks transaction ${txInfo!.id || ''} was not completed successfully. Final Status: ${currentStatus} ${txInfo!?.subStatus ? `(${txInfo!?.subStatus})` : ''}` })
     }
 
     return txInfo!
