@@ -11,24 +11,36 @@ npm install @fireblocks/fireblocks-web3-provider
 
 ## Setup
 ```js
-import { FireblocksWeb3Provider, ChainId } from "@fireblocks/fireblocks-web3-provider";
+import { FireblocksWeb3Provider, ChainId, ApiBaseUrl } from "@fireblocks/fireblocks-web3-provider";
 
 const eip1193Provider = new FireblocksWeb3Provider({
+    // apiBaseUrl: ApiBaseUrl.Sandbox // If using a sandbox workspace
     privateKey: process.env.FIREBLOCKS_API_PRIVATE_KEY_PATH,
     apiKey: process.env.FIREBLOCKS_API_KEY,
     vaultAccountIds: process.env.FIREBLOCKS_VAULT_ACCOUNT_IDS,
     chainId: ChainId.GOERLI,
+
+    logTransactionStatusChanges: true, // Verbose logging
 })
 ```
 
 ## Usage with ethers.js
+```sh
+npm install ethers@5
+```
+
 ```js
 import * as ethers from "ethers"
 
 const provider = new ethers.providers.Web3Provider(eip1193Provider);
+// const provider = new ethers.BrowserProvider(eip1193Provider); // For ethers v6
 ```
 
 ## Usage with web3.js
+```sh
+npm install web3
+```
+
 ```js
 import Web3 from "web3";
 
@@ -80,6 +92,11 @@ type FireblocksProviderConfig = {
    * It is recommended to provide the vault account ids explicitly because it helps avoid unnecessary API calls
    */
   vaultAccountIds?: number | number[] | string | string[],
+  /** 
+   * By default, it uses the Fireblocks API production endpoint
+   * When using a sandbox workspace, you should provide the ApiBaseUrl.Sandbox value
+   */
+  apiBaseUrl?: ApiBaseUrl | string,
   /**
    * By default, the fallback fee level is set to FeeLevel.MEDIUM
    */
@@ -111,5 +128,10 @@ type FireblocksProviderConfig = {
    * If you are using a private/custom EVM chain, you can provide its Fireblocks assetId here
    */
   assetId?: string,
+  /**
+   * Default: false
+   * By setting to true, every transaction status change will be logged to the console
+   */
+  logTransactionStatusChanges?: boolean,
 }
 ```
