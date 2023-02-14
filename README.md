@@ -11,13 +11,16 @@ npm install @fireblocks/fireblocks-web3-provider
 
 ## Setup
 ```js
-import { FireblocksWeb3Provider, ChainId } from "@fireblocks/fireblocks-web3-provider";
+import { FireblocksWeb3Provider, ChainId, ApiBaseUrl } from "@fireblocks/fireblocks-web3-provider";
 
 const eip1193Provider = new FireblocksWeb3Provider({
+    // apiBaseUrl: ApiBaseUrl.Sandbox // If using a sandbox workspace
     privateKey: process.env.FIREBLOCKS_API_PRIVATE_KEY_PATH,
     apiKey: process.env.FIREBLOCKS_API_KEY,
     vaultAccountIds: process.env.FIREBLOCKS_VAULT_ACCOUNT_IDS,
     chainId: ChainId.GOERLI,
+
+    logTransactionStatusChanges: true, // Verbose logging
 })
 ```
 
@@ -80,6 +83,11 @@ type FireblocksProviderConfig = {
    * It is recommended to provide the vault account ids explicitly because it helps avoid unnecessary API calls
    */
   vaultAccountIds?: number | number[] | string | string[],
+  /** 
+   * By default, it uses the Fireblocks API production endpoint
+   * When using a sandbox workspace, you should provide the ApiBaseUrl.Sandbox value
+   */
+  apiBaseUrl?: ApiBaseUrl | string,
   /**
    * By default, the fallback fee level is set to FeeLevel.MEDIUM
    */

@@ -28,6 +28,11 @@ export enum ChainId {
   RONIN = 2020,
 }
 
+export enum ApiBaseUrl {
+  Production = "https://api.fireblocks.io",
+  Sandbox = "https://sandbox-api.fireblocks.io",
+}
+
 export type Asset = {
   assetId: string,
   rpcUrl: string,
@@ -72,6 +77,11 @@ export type FireblocksProviderConfig = {
    * It is recommended to provide the vault account ids explicitly because it helps avoid unnecessary API calls
    */
   vaultAccountIds?: number | number[] | string | string[],
+  /** 
+   * By default, it uses the Fireblocks API production endpoint
+   * When using a sandbox workspace, you should provide the ApiBaseUrl.Sandbox value
+   */
+  apiBaseUrl?: ApiBaseUrl | string,
   /**
    * By default, the fallback fee level is set to FeeLevel.MEDIUM
    */

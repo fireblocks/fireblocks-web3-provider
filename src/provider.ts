@@ -2,7 +2,7 @@ import util from "util";
 import { DestinationTransferPeerPath, FeeLevel, FireblocksSDK, TransactionArguments, TransactionResponse, TransactionStatus } from "fireblocks-sdk";
 import { getAssetByChain } from "./utils";
 import { readFileSync } from "fs";
-import { ChainId, FireblocksProviderConfig, ProviderRpcError, RawMessageType, RequestArguments } from "./types";
+import { ApiBaseUrl, ChainId, FireblocksProviderConfig, ProviderRpcError, RawMessageType, RequestArguments } from "./types";
 import { PeerType, TransactionOperation } from "fireblocks-sdk";
 import { formatEther, formatUnits } from "@ethersproject/units";
 import { FINAL_SUCCESSFUL_TRANSACTION_STATES, FINAL_TRANSACTION_STATES } from "./constants";
@@ -42,9 +42,14 @@ export class FireblocksWeb3Provider extends HttpProvider {
     super(config.rpcUrl || asset.rpcUrl)
 
     this.config = config
-    this.fireblocksApiClient = new FireblocksSDK(this.parsePrivateKey(config.privateKey), config.apiKey, undefined, undefined, {
-      userAgent: this.getUserAgent(),
-    })
+    this.fireblocksApiClient = new FireblocksSDK(
+      this.parsePrivateKey(config.privateKey),
+      config.apiKey,
+      config.apiBaseUrl || ApiBaseUrl.Production,
+      undefined,
+      {
+        userAgent: this.getUserAgent(),
+      })
     this.feeLevel = config.fallbackFeeLevel || FeeLevel.MEDIUM
     this.note = config.note || 'Created by Fireblocks Web3 Provider'
     this.externalTxId = config.externalTxId;
