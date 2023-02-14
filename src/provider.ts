@@ -161,9 +161,7 @@ export class FireblocksWeb3Provider extends HttpProvider {
 
   private async populateWhitelisted() {
     if (Object.keys(this.whitelisted).length > 0) {
-
       throw this.createError({ message: "Whitelisted already populated" })
-
     }
 
     await this.assetAndChainIdPopulatedPromise
