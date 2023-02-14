@@ -237,7 +237,6 @@ export class FireblocksWeb3Provider extends HttpProvider {
             const jsonRpcResponse = await util.promisify<any, any>(super.send).bind(this)(payload)
 
             if (jsonRpcResponse.error) {
-              console.log(jsonRpcResponse)
               throw this.createError({
                 message: jsonRpcResponse.error.message,
                 code: jsonRpcResponse.error.code,
