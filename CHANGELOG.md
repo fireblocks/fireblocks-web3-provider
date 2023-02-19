@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v1.1.4](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.1.3...v1.1.4)
+
+> 19 February 2023
+
+- Better error handling when missing an asset wallet [`3afb2f9`](https://github.com/fireblocks/fireblocks-web3-provider/commit/3afb2f9b03dd90c4f4f6b6de1e324e75b25ef1fa)
+- release 1.1.3 [`39077d6`](https://github.com/fireblocks/fireblocks-web3-provider/commit/39077d665e905cefea178702401b5f94c97cabb7)
+- Avoid including `createError` in the stack trace [`204b71b`](https://github.com/fireblocks/fireblocks-web3-provider/commit/204b71b3cd4102d6875db82a068308c31e4cf255)
+
 #### [v1.1.3](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.1.2...v1.1.3)
 
 > 14 February 2023
