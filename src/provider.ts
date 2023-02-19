@@ -266,6 +266,12 @@ export class FireblocksWeb3Provider extends HttpProvider {
     error.code = errorData.code || -32603
     error.data = errorData.data
     error.payload = errorData.payload
+
+    // We do this to avoid including this function in the stack trace
+    if ((Error as any).captureStackTrace !== undefined) {
+      (Error as any).captureStackTrace(error, this.createError);
+    }
+
     return error
   }
 
