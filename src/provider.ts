@@ -131,12 +131,18 @@ export class FireblocksWeb3Provider extends HttpProvider {
     await this.assetAndChainIdPopulatedPromise
 
     for (const vaultAccountId of this.vaultAccountIds) {
+      let depositAddresses
       try {
-        const depositAddresses = await this.fireblocksApiClient.getDepositAddresses(vaultAccountId.toString(), this.assetId!);
-        this.accounts[vaultAccountId] = depositAddresses[0].address;
-      } catch (e: any) {
-        throw this.createFireblocksError(e)
+        depositAddresses = await this.fireblocksApiClient.getDepositAddresses(vaultAccountId.toString(), this.assetId!);
+      } catch (error) {
+        throw this.createFireblocksError(error)
       }
+
+      if (depositAddresses.length == 0) {
+        throw this.createError({ message: `No ${this.assetId} asset wallet found for vault account with id ${vaultAccountId}` })
+      }
+
+      this.accounts[vaultAccountId] = depositAddresses[0].address;
     }
   }
 
