@@ -5,10 +5,14 @@ import { readFileSync } from "fs";
 import { ApiBaseUrl, ChainId, FireblocksProviderConfig, ProviderRpcError, RawMessageType, RequestArguments } from "./types";
 import { PeerType, TransactionOperation } from "fireblocks-sdk";
 import { formatEther, formatUnits } from "@ethersproject/units";
-import { FINAL_SUCCESSFUL_TRANSACTION_STATES, FINAL_TRANSACTION_STATES } from "./constants";
+import { DEBUG_NAMESPACE, DEBUG_NAMESPACE_ENHANCED_ERROR_HANDLING, DEBUG_NAMESPACE_TX_STATUS_CHANGES, FINAL_SUCCESSFUL_TRANSACTION_STATES, FINAL_TRANSACTION_STATES } from "./constants";
 import { formatJsonRpcRequest, formatJsonRpcResult } from "./jsonRpcUtils";
 import { version as SDK_VERSION } from "../package.json";
+import Debug from "debug";
 const HttpProvider = require("web3-providers-http");
+const logTransactionStatusChange = Debug(DEBUG_NAMESPACE_TX_STATUS_CHANGES);
+const logEnhancedErrorHandling = Debug(DEBUG_NAMESPACE_ENHANCED_ERROR_HANDLING);
+
 
 export class FireblocksWeb3Provider extends HttpProvider {
   private fireblocksApiClient: FireblocksSDK;
@@ -37,6 +41,12 @@ export class FireblocksWeb3Provider extends HttpProvider {
     } : getAssetByChain(config.chainId!);
     if (!asset && !config.rpcUrl) {
       throw Error(`Unsupported chain id: ${config.chainId}.\nSupported chains ids: ${Object.keys(ChainId).join(', ')}\nIf you're using a private blockchain, you can specify the blockchain's Fireblocks Asset ID via the "assetId" config param.`);
+    }
+    if (config.logTransactionStatusChanges) {
+      Debug.enable(DEBUG_NAMESPACE_TX_STATUS_CHANGES)
+    }
+    if (config.enhancedErrorHandling || config.enhancedErrorHandling == undefined) {
+      Debug.enable(DEBUG_NAMESPACE_ENHANCED_ERROR_HANDLING)
     }
 
     super(config.rpcUrl || asset.rpcUrl)
@@ -216,7 +226,12 @@ export class FireblocksWeb3Provider extends HttpProvider {
             break;
 
           case "eth_sendTransaction":
-            result = await this.createContractCall(payload.params[0]);
+            try {
+              result = await this.createContractCall(payload.params[0]);
+            } catch (error) {
+              logEnhancedErrorHandling(`Simulate the failed transaction on Tenderly: ${this.createTenderlySimulationLink(payload.params[0])}`)
+              throw error
+            }
             break;
 
           case "personal_sign":
@@ -243,6 +258,9 @@ export class FireblocksWeb3Provider extends HttpProvider {
             const jsonRpcResponse = await util.promisify<any, any>(super.send).bind(this)(payload)
 
             if (jsonRpcResponse.error) {
+              if (payload.method == 'eth_estimateGas') {
+                logEnhancedErrorHandling(`Simulate the failed transaction on Tenderly: ${this.createTenderlySimulationLink(payload.params[0])}`)
+              }
               throw this.createError({
                 message: jsonRpcResponse.error.message,
                 code: jsonRpcResponse.error.code,
@@ -259,6 +277,22 @@ export class FireblocksWeb3Provider extends HttpProvider {
 
       callback(error, formatJsonRpcResult(payload.id, result));
     })();
+  }
+
+  private createTenderlySimulationLink(tx: any): String {
+    const searchParams = new URLSearchParams(JSON.parse(JSON.stringify({
+      ...tx,
+
+      to: undefined,
+      contractAddress: tx.to,
+
+      data: undefined,
+      rawFunctionInput: tx.data || '0x',
+
+      network: this.chainId,
+    })));
+
+    return `https://dashboard.tenderly.co/simulator/new?${searchParams.toString()}`
   }
 
   private createError(errorData: { message: string, code?: number, data?: any, payload?: any }): ProviderRpcError {
@@ -435,8 +469,8 @@ Available addresses: ${Object.values(this.accounts).join(', ')}.`
       try {
         txInfo = await this.fireblocksApiClient.getTransactionById(id);
 
-        if (this.config.logTransactionStatusChanges && currentStatus != txInfo.status) {
-          console.log(`Fireblocks transaction ${txInfo.id} changed status from ${currentStatus} to ${txInfo.status} ${txInfo.subStatus ? `(${txInfo.subStatus})` : ''}`)
+        if (currentStatus != txInfo.status) {
+          logTransactionStatusChange(`Fireblocks transaction ${txInfo.id} changed status from ${currentStatus} to ${txInfo.status} ${txInfo.subStatus ? `(${txInfo.subStatus})` : ''}`)
         }
         currentStatus = txInfo.status;
       } catch (err) {

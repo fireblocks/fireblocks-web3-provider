@@ -116,8 +116,16 @@ export type FireblocksProviderConfig = {
   /**
    * Default: false
    * By setting to true, every transaction status change will be logged to the console
+   * Same as setting env var `DEBUG=fireblocks-web3-provider:status`
    */
   logTransactionStatusChanges?: boolean,
+  /**
+   * Default: true
+   * By setting to true, every failed transaction will print additional information
+   * helpful for debugging, such as a link to simulate the transaction on Tenderly
+   * Same as setting env var `DEBUG=fireblocks-web3-provider:error`
+   */
+  enhancedErrorHandling?: boolean,
 }
 
 export interface RequestArguments<T = any> {
