@@ -126,6 +126,14 @@ export type FireblocksProviderConfig = {
    * Same as setting env var `DEBUG=fireblocks-web3-provider:error`
    */
   enhancedErrorHandling?: boolean,
+  /**
+   * Warning: This is an undocumented experimental flag that is subject to breaking changes
+   * Warning: Use at your own risk
+   * By default, no contracts are interacted with gaslessly
+   * By setting a gaslessGasTankVaultId, all transactions will be sent gaslessly, 
+   * relayed via the provided vault account
+   */
+  gaslessGasTankVaultId?: number,
 }
 
 export interface RequestArguments<T = any> {

@@ -4,8 +4,11 @@ import { getAssetByChain } from "./utils";
 import { readFileSync } from "fs";
 import { ApiBaseUrl, ChainId, FireblocksProviderConfig, ProviderRpcError, RawMessageType, RequestArguments } from "./types";
 import { PeerType, TransactionOperation } from "fireblocks-sdk";
-import { formatEther, formatUnits } from "@ethersproject/units";
+import { formatEther, formatUnits, parseEther } from "@ethersproject/units";
 import { DEBUG_NAMESPACE, DEBUG_NAMESPACE_ENHANCED_ERROR_HANDLING, DEBUG_NAMESPACE_TX_STATUS_CHANGES, FINAL_SUCCESSFUL_TRANSACTION_STATES, FINAL_TRANSACTION_STATES } from "./constants";
+import * as ethers from "ethers";
+import { NativeMetaTransaction__factory } from "./contracts/factories"
+import { _TypedDataEncoder } from "@ethersproject/hash";
 import { formatJsonRpcRequest, formatJsonRpcResult } from "./jsonRpcUtils";
 import { version as SDK_VERSION } from "../package.json";
 import Debug from "debug";
@@ -24,12 +27,15 @@ export class FireblocksWeb3Provider extends HttpProvider {
   private feeLevel: FeeLevel;
   private note: string;
   private externalTxId: (() => string) | string | undefined;
+  private gaslessGasTankVaultId?: number;
+  private gaslessGasTankVaultAddress?: string;
   private accountsPopulatedPromise: Promise<void>;
   private pollingInterval: number;
   private oneTimeAddressesEnabled: boolean;
   private whitelisted: { [address: string]: { type: string, id: string } } = {};
   private whitelistedPopulatedPromise: Promise<void>;
   private assetAndChainIdPopulatedPromise: Promise<void>;
+  private gaslessGasTankAddressPopulatedPromise: Promise<void>;
 
   constructor(config: FireblocksProviderConfig) {
     if (config.assetId && !config.rpcUrl) {
@@ -63,6 +69,7 @@ export class FireblocksWeb3Provider extends HttpProvider {
     this.feeLevel = config.fallbackFeeLevel || FeeLevel.MEDIUM
     this.note = config.note || 'Created by Fireblocks Web3 Provider'
     this.externalTxId = config.externalTxId;
+    this.gaslessGasTankVaultId = config.gaslessGasTankVaultId
     this.vaultAccountIds = this.parseVaultAccountIds(config.vaultAccountIds)
     this.pollingInterval = config.pollingInterval || 1000
     this.oneTimeAddressesEnabled = config.oneTimeAddressesEnabled ?? true
@@ -71,6 +78,7 @@ export class FireblocksWeb3Provider extends HttpProvider {
     this.assetAndChainIdPopulatedPromise = this.chainId ? Promise.resolve() : this.populateAssetAndChainId()
     this.accountsPopulatedPromise = this.populateAccounts()
     this.whitelistedPopulatedPromise = this.oneTimeAddressesEnabled ? Promise.resolve() : this.populateWhitelisted()
+    this.gaslessGasTankAddressPopulatedPromise = this.gaslessGasTankVaultId == undefined ? Promise.resolve() : this.populateGaslessGasTankAddress()
   }
 
   private parsePrivateKey(privateKey: string): string {
@@ -79,6 +87,16 @@ export class FireblocksWeb3Provider extends HttpProvider {
     } else {
       return privateKey
     }
+  }
+
+  private async populateGaslessGasTankAddress(): Promise<void> {
+    await this.assetAndChainIdPopulatedPromise
+    const depositAddresses = await this.fireblocksApiClient.getDepositAddresses(this.gaslessGasTankVaultId!.toString(), this.assetId!)
+    if (depositAddresses.length === 0) {
+      throw Error(`Gasless gas tank vault not found (vault id: ${this.gaslessGasTankVaultId})`)
+    }
+    this.gaslessGasTankVaultAddress = depositAddresses[0].address
+    this.accounts[this.gaslessGasTankVaultId!] = this.gaslessGasTankVaultAddress
   }
 
   private parseVaultAccountIds(vaultAccountIds: number | number[] | string | string[] | undefined): number[] | undefined {
@@ -204,9 +222,10 @@ export class FireblocksWeb3Provider extends HttpProvider {
   }
 
   private async initialized() {
-    await this.assetAndChainIdPopulatedPromise;
+    await this.assetAndChainIdPopulatedPromise
     await this.accountsPopulatedPromise
     await this.whitelistedPopulatedPromise
+    await this.gaslessGasTankAddressPopulatedPromise
   }
 
   public send(
@@ -222,12 +241,17 @@ export class FireblocksWeb3Provider extends HttpProvider {
           case "eth_requestAccounts":
           case "eth_accounts":
             await this.accountsPopulatedPromise
-            result = Object.values(this.accounts);
+            result = Object.values(this.accounts)
+              .filter((addr: any) => addr.toLowerCase() != (this.gaslessGasTankVaultAddress || '').toLowerCase())
             break;
 
           case "eth_sendTransaction":
             try {
-              result = await this.createContractCall(payload.params[0]);
+              if (this.gaslessGasTankVaultId != undefined && payload.params[0].from.toLowerCase() != this.gaslessGasTankVaultAddress!.toLowerCase()) {
+                result = this.createGaslessTransaction(payload.params[0]);
+              } else {
+                result = await this.createContractCall(payload.params[0]);
+              }
             } catch (error) {
               logEnhancedErrorHandling(`Simulate the failed transaction on Tenderly: ${this.createTenderlySimulationLink(payload.params[0])}`)
               throw error
@@ -359,6 +383,56 @@ Available addresses: ${Object.values(this.accounts).join(', ')}.`
     }
 
     return vaultAccountId
+  }
+
+  private async createGaslessTransaction(transaction: any) {
+    if (transaction.chainId && transaction.chainId != this.chainId) {
+      throw new Error(`Chain ID of the transaction (${transaction.chainId}) does not match the chain ID of the FireblocksWeb3Provider (${this.chainId})`);
+    }
+
+    if (!transaction.from) {
+      throw new Error(`Transaction sent with no "from" field`);
+    }
+
+    const { data, from, to } = transaction
+
+    const ethersProvider = new ethers.providers.Web3Provider(this)
+    const NativeMetaTransactionContract = NativeMetaTransaction__factory.connect(to, ethersProvider.getSigner(this.gaslessGasTankVaultAddress))
+
+    const nonce = Number(await NativeMetaTransactionContract.getNonce(from))
+    const name = await NativeMetaTransactionContract.name()
+    const version = await NativeMetaTransactionContract.ERC712_VERSION()
+
+    const req = {
+      nonce,
+      from: from,
+      functionSignature: data,
+    };
+
+    const domain = {
+      name,
+      version,
+      // @ts-ignore
+      salt: ethers.utils.hexZeroPad(this.chainId, 32),
+      verifyingContract: to,
+    }
+
+    const types = {
+      MetaTransaction: [
+        { name: 'nonce', type: 'uint256' },
+        { name: 'from', type: 'address' },
+        { name: 'functionSignature', type: 'bytes' },
+      ],
+    }
+    const signature = ethers.utils.splitSignature(await ethersProvider.getSigner(from)._signTypedData(
+      domain,
+      types,
+      req
+    ));
+
+    const relayedTx = await NativeMetaTransactionContract.executeMetaTransaction(from, data, signature.r, signature.s, signature.v)
+
+    return relayedTx.hash
   }
 
   private async createContractCall(transaction: any) {
