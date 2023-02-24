@@ -246,10 +246,10 @@ export class FireblocksWeb3Provider extends HttpProvider {
           case "eth_sendTransaction":
             try {
               if (this.gaslessGasTankVaultId != undefined && payload.params[0].from.toLowerCase() != this.gaslessGasTankVaultAddress!.toLowerCase()) {
-              result = this.createGaslessTransaction(payload.params[0]);
-            } else {
-              result = await this.createContractCall(payload.params[0]);
-            }
+                result = this.createGaslessTransaction(payload.params[0]);
+              } else {
+                result = await this.createContractCall(payload.params[0]);
+              }
             } catch (error) {
               logEnhancedErrorHandling(`Simulate the failed transaction on Tenderly: ${this.createTenderlySimulationLink(payload.params[0])}`)
               throw error
@@ -390,56 +390,6 @@ Available addresses: ${Object.values(this.accounts).join(', ')}.`
 
     if (!transaction.from) {
       throw new Error(`Transaction sent with no "from" field`);
-    }
-
-    const { data, from, to } = transaction
-
-    const ethersProvider = new ethers.providers.Web3Provider(this)
-    const NativeMetaTransactionContract = NativeMetaTransaction__factory.connect(to, ethersProvider.getSigner(this.gaslessGasTankVaultAddress))
-
-    const nonce = Number(await NativeMetaTransactionContract.getNonce(from))
-    const name = await NativeMetaTransactionContract.name()
-    const version = await NativeMetaTransactionContract.ERC712_VERSION()
-
-    const req = {
-      nonce,
-      from: from,
-      functionSignature: data,
-    };
-
-    const domain = {
-      name,
-      version,
-      // @ts-ignore
-      salt: ethers.utils.hexZeroPad(this.chainId, 32),
-      verifyingContract: to,
-    }
-
-    const types = {
-      MetaTransaction: [
-        { name: 'nonce', type: 'uint256' },
-        { name: 'from', type: 'address' },
-        { name: 'functionSignature', type: 'bytes' },
-      ],
-    }
-    const signature = ethers.utils.splitSignature(await ethersProvider.getSigner(from)._signTypedData(
-      domain,
-      types,
-      req
-    ));
-
-    const relayedTx = await NativeMetaTransactionContract.executeMetaTransaction(from, data, signature.r, signature.s, signature.v)
-
-    return relayedTx.hash
-  }
-  
-  private async createContractCall(transaction: any) {
-    if (transaction.chainId && transaction.chainId != this.chainId) {
-      throw this.createError({ message: `Chain ID of the transaction (${transaction.chainId}) does not match the chain ID of the FireblocksWeb3Provider (${this.chainId})` })
-    }
-
-    if (!transaction.from) {
-      throw this.createError({ message: `Transaction sent with no "from" field` })
     }
 
     const { data, from, to } = transaction
