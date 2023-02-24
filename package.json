@@ -57,7 +57,6 @@
   "dependencies": {
     "@ethersproject/units": "^5.7.0",
     "debug": "^4.3.4",
-    "dotenv": "^16.0.3",
     "fireblocks-sdk": "^3.1.4",
     "web3-providers-http": "1.8.0"
   }
