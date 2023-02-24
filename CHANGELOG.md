@@ -2,6 +2,59 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v1.1.4](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.1.3...v1.1.4)
+
+> 19 February 2023
+
+- Better error handling when missing an asset wallet [`3afb2f9`](https://github.com/fireblocks/fireblocks-web3-provider/commit/3afb2f9b03dd90c4f4f6b6de1e324e75b25ef1fa)
+- release 1.1.3 [`39077d6`](https://github.com/fireblocks/fireblocks-web3-provider/commit/39077d665e905cefea178702401b5f94c97cabb7)
+- Avoid including `createError` in the stack trace [`204b71b`](https://github.com/fireblocks/fireblocks-web3-provider/commit/204b71b3cd4102d6875db82a068308c31e4cf255)
+
+#### [v1.1.3](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.1.2...v1.1.3)
+
+> 14 February 2023
+
+- release 1.1.2 [`fa1b7ff`](https://github.com/fireblocks/fireblocks-web3-provider/commit/fa1b7ff154d25155d3f5d6b16298fd89a10f69f0)
+- Remove console.log [`8600aaa`](https://github.com/fireblocks/fireblocks-web3-provider/commit/8600aaac62c0b90d936c75b63e69d5bbf45b0a76)
+
+#### [v1.1.2](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.1.1...v1.1.2)
+
+> 14 February 2023
+
+- EIP-1193 Compliant Error Handling [`9b122d2`](https://github.com/fireblocks/fireblocks-web3-provider/commit/9b122d287d2b94abe025d3cc223bb1d71dc52a81)
+- Update ethers [`ddefe88`](https://github.com/fireblocks/fireblocks-web3-provider/commit/ddefe889c1ca3d9853d12544e8e9b8b7f900dab1)
+- Better error handling [`22241ff`](https://github.com/fireblocks/fireblocks-web3-provider/commit/22241ffcd8f4028aa16ea06c20a4017be095eacd)
+
+#### [v1.1.1](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.1.0...v1.1.1)
+
+> 7 February 2023
+
+- release 1.1.0 [`780eb7e`](https://github.com/fireblocks/fireblocks-web3-provider/commit/780eb7eda1f9a45bd23332c2340e0b61545e79f8)
+- Improved error message for assetId [`ffec2a4`](https://github.com/fireblocks/fireblocks-web3-provider/commit/ffec2a405999b665449e54ddb6a0c4dacec27ab1)
+
+#### [v1.1.0](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.0.2...v1.1.0)
+
+> 7 February 2023
+
+- Add `assetId` config to support private blockchains [`#6`](https://github.com/fireblocks/fireblocks-web3-provider/pull/6)
+- release 1.0.2 [`ca145ef`](https://github.com/fireblocks/fireblocks-web3-provider/commit/ca145efab2be40ecf965d5c5d12861a910f78739)
+- Upgrade http-cache-semantics [`b6b3707`](https://github.com/fireblocks/fireblocks-web3-provider/commit/b6b37070d68b9682143b58dd6ccec09a846b6acc)
+
+#### [v1.0.2](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.0.1...v1.0.2)
+
+> 22 January 2023
+
+- Upgrade web3 [`181fd28`](https://github.com/fireblocks/fireblocks-web3-provider/commit/181fd28d950f6b1cbc9bced6b2a29b8a2e96f001)
+- Use TSDoc notation [`e1184ef`](https://github.com/fireblocks/fireblocks-web3-provider/commit/e1184ef1a3f97cb8d505c2369ff3d9f4eaa80d91)
+- Update fireblocks-sdk to 3.1.3 [`fd1f5f4`](https://github.com/fireblocks/fireblocks-web3-provider/commit/fd1f5f49d1af00b602db934c77cd7d1153578cc9)
+
+#### [v1.0.1](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.0.0...v1.0.1)
+
+> 1 January 2023
+
+- Bump jsonwebtoken and fireblocks-sdk [`#3`](https://github.com/fireblocks/fireblocks-web3-provider/pull/3)
+- release 1.0.0 [`727dfff`](https://github.com/fireblocks/fireblocks-web3-provider/commit/727dfff0a71c656e3dc51a2919883ea5d34e6156)
+
 ### [v1.0.0](https://github.com/fireblocks/fireblocks-web3-provider/compare/v0.0.9...v1.0.0)
 
 > 29 December 2022

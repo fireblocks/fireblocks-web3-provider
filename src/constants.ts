@@ -47,5 +47,17 @@ export const FINAL_TRANSACTION_STATES = [
   TransactionStatus.FAILED,
   TransactionStatus.CANCELLED,
   TransactionStatus.BLOCKED,
-  TransactionStatus.REJECTED
+  TransactionStatus.REJECTED,
+  TransactionStatus.BROADCASTING,
+  TransactionStatus.CONFIRMING,
 ]
+
+export const FINAL_SUCCESSFUL_TRANSACTION_STATES = [
+  TransactionStatus.COMPLETED,
+  TransactionStatus.BROADCASTING,
+  TransactionStatus.CONFIRMING,
+]
+
+export const DEBUG_NAMESPACE = 'fireblocks-web3-provider'
+export const DEBUG_NAMESPACE_TX_STATUS_CHANGES = `${DEBUG_NAMESPACE}:status`
+export const DEBUG_NAMESPACE_ENHANCED_ERROR_HANDLING = `${DEBUG_NAMESPACE}:error`

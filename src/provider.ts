@@ -1,20 +1,21 @@
 import util from "util";
-import {
-  RequestArguments,
-  formatJsonRpcRequest,
-  formatJsonRpcResult,
-} from "@json-rpc-tools/utils";
 import { DestinationTransferPeerPath, FeeLevel, FireblocksSDK, TransactionArguments, TransactionResponse, TransactionStatus } from "fireblocks-sdk";
 import { getAssetByChain } from "./utils";
 import { readFileSync } from "fs";
-import { ChainId, FireblocksProviderConfig, RawMessageType } from "./types";
+import { ApiBaseUrl, ChainId, FireblocksProviderConfig, ProviderRpcError, RawMessageType, RequestArguments } from "./types";
 import { PeerType, TransactionOperation } from "fireblocks-sdk";
 import { formatEther, formatUnits, parseEther } from "@ethersproject/units";
-import { FINAL_TRANSACTION_STATES } from "./constants";
+import { DEBUG_NAMESPACE, DEBUG_NAMESPACE_ENHANCED_ERROR_HANDLING, DEBUG_NAMESPACE_TX_STATUS_CHANGES, FINAL_SUCCESSFUL_TRANSACTION_STATES, FINAL_TRANSACTION_STATES } from "./constants";
 import * as ethers from "ethers";
 import { NativeMetaTransaction__factory } from "./contracts/factories"
 import { _TypedDataEncoder } from "@ethersproject/hash";
+import { formatJsonRpcRequest, formatJsonRpcResult } from "./jsonRpcUtils";
+import { version as SDK_VERSION } from "../package.json";
+import Debug from "debug";
 const HttpProvider = require("web3-providers-http");
+const logTransactionStatusChange = Debug(DEBUG_NAMESPACE_TX_STATUS_CHANGES);
+const logEnhancedErrorHandling = Debug(DEBUG_NAMESPACE_ENHANCED_ERROR_HANDLING);
+
 
 export class FireblocksWeb3Provider extends HttpProvider {
   private fireblocksApiClient: FireblocksSDK;
@@ -37,15 +38,34 @@ export class FireblocksWeb3Provider extends HttpProvider {
   private gaslessGasTankAddressPopulatedPromise: Promise<void>;
 
   constructor(config: FireblocksProviderConfig) {
-    const asset = getAssetByChain(config.chainId!);
+    if (config.assetId && !config.rpcUrl) {
+      throw Error(`If you supply an assetId, you must also supply an rpcUrl`);
+    }
+    const asset = config.assetId ? {
+      assetId: config.assetId,
+      rpcUrl: config.rpcUrl,
+    } : getAssetByChain(config.chainId!);
     if (!asset && !config.rpcUrl) {
-      throw Error(`Unsupported chain id: ${config.chainId}. Supported chains ids: ${Object.keys(ChainId).join(', ')}`);
+      throw Error(`Unsupported chain id: ${config.chainId}.\nSupported chains ids: ${Object.keys(ChainId).join(', ')}\nIf you're using a private blockchain, you can specify the blockchain's Fireblocks Asset ID via the "assetId" config param.`);
+    }
+    if (config.logTransactionStatusChanges) {
+      Debug.enable(DEBUG_NAMESPACE_TX_STATUS_CHANGES)
+    }
+    if (config.enhancedErrorHandling || config.enhancedErrorHandling == undefined) {
+      Debug.enable(DEBUG_NAMESPACE_ENHANCED_ERROR_HANDLING)
     }
 
     super(config.rpcUrl || asset.rpcUrl)
 
-    this.fireblocksApiClient = new FireblocksSDK(this.parsePrivateKey(config.privateKey), config.apiKey)
     this.config = config
+    this.fireblocksApiClient = new FireblocksSDK(
+      this.parsePrivateKey(config.privateKey),
+      config.apiKey,
+      config.apiBaseUrl || ApiBaseUrl.Production,
+      undefined,
+      {
+        userAgent: this.getUserAgent(),
+      })
     this.feeLevel = config.fallbackFeeLevel || FeeLevel.MEDIUM
     this.note = config.note || 'Created by Fireblocks Web3 Provider'
     this.externalTxId = config.externalTxId;
@@ -53,11 +73,9 @@ export class FireblocksWeb3Provider extends HttpProvider {
     this.vaultAccountIds = this.parseVaultAccountIds(config.vaultAccountIds)
     this.pollingInterval = config.pollingInterval || 1000
     this.oneTimeAddressesEnabled = config.oneTimeAddressesEnabled ?? true
-    if (config.chainId) {
-      this.assetId = asset.assetId
-      this.chainId = config.chainId
-    }
-    this.assetAndChainIdPopulatedPromise = config.chainId ? Promise.resolve() : this.populateAssetAndChainId()
+    this.chainId = config.chainId
+    this.assetId = asset?.assetId
+    this.assetAndChainIdPopulatedPromise = this.chainId ? Promise.resolve() : this.populateAssetAndChainId()
     this.accountsPopulatedPromise = this.populateAccounts()
     this.whitelistedPopulatedPromise = this.oneTimeAddressesEnabled ? Promise.resolve() : this.populateWhitelisted()
     this.gaslessGasTankAddressPopulatedPromise = this.gaslessGasTankVaultId == undefined ? Promise.resolve() : this.populateGaslessGasTankAddress()
@@ -93,6 +111,14 @@ export class FireblocksWeb3Provider extends HttpProvider {
     }
   }
 
+  private getUserAgent(): string {
+    let userAgent = `fireblocks-web3-provider/${SDK_VERSION}`;
+    if (this.config.userAgent) {
+      userAgent = `${this.config.userAgent} ${userAgent}`;
+    }
+    return userAgent;
+  }
+
   private async getVaultAccounts(): Promise<number[]> {
     await this.assetAndChainIdPopulatedPromise
 
@@ -109,19 +135,21 @@ export class FireblocksWeb3Provider extends HttpProvider {
   // Called by the constructor in case rpcUrl is provided, and chainId not
   private async populateAssetAndChainId() {
     const chainId = (await util.promisify<any, any>(super.send).bind(this)(formatJsonRpcRequest('eth_chainId', []))).result
-
-    const asset = getAssetByChain(Number(chainId))
-    if (!asset) {
-      throw Error(`Unsupported chain id: ${chainId}. Supported chains ids: ${Object.keys(ChainId).join(', ')}`)
-    }
-
-    this.assetId = asset.assetId
     this.chainId = Number(chainId)
+
+    if (!this.assetId) {
+      const asset = getAssetByChain(Number(chainId))
+      if (!asset) {
+        throw this.createError({ message: `Unsupported chain id: ${chainId}.\nSupported chains ids: ${Object.keys(ChainId).join(', ')}\nIf you're using a private blockchain, you can specify the blockchain's Fireblocks Asset ID via the "assetId" config param.` })
+      }
+
+      this.assetId = asset.assetId
+    }
   }
 
   private async populateAccounts() {
     if (Object.keys(this.accounts).length > 0) {
-      throw new Error("Accounts already populated");
+      throw this.createError({ message: "Accounts already populated" })
     }
 
     if (!this.vaultAccountIds) {
@@ -131,15 +159,29 @@ export class FireblocksWeb3Provider extends HttpProvider {
     await this.assetAndChainIdPopulatedPromise
 
     for (const vaultAccountId of this.vaultAccountIds) {
+      let depositAddresses
       try {
-        const depositAddresses = await this.fireblocksApiClient.getDepositAddresses(vaultAccountId.toString(), this.assetId!);
-        this.accounts[vaultAccountId] = depositAddresses[0].address;
-      } catch {
-        if (this.config.vaultAccountIds !== undefined) {
-          throw new Error(`Failed to find Fireblocks vault account ${vaultAccountId}`);
-        }
+        depositAddresses = await this.fireblocksApiClient.getDepositAddresses(vaultAccountId.toString(), this.assetId!);
+      } catch (error) {
+        throw this.createFireblocksError(error)
       }
+
+      if (depositAddresses.length == 0) {
+        throw this.createError({ message: `No ${this.assetId} asset wallet found for vault account with id ${vaultAccountId}` })
+      }
+
+      this.accounts[vaultAccountId] = depositAddresses[0].address;
     }
+  }
+
+  private createFireblocksError(e: any) {
+    const code = e?.response?.status == 401 ? 4100 : undefined
+    let message = e?.response?.data?.message || e?.message || 'Unknown error'
+    message = `Fireblocks SDK Error: ${message}`
+    message = e?.response?.data?.code ? `${message} (Error code: ${e.response.data.code})` : message
+    message = e?.response?.headers?.['x-request-id'] ? `${message} (Request ID: ${e.response.headers['x-request-id']})` : message
+
+    return this.createError({ message, code })
   }
 
   private async getWhitelistedWallets(walletsPromise: Promise<any>, type: PeerType, assetId: string) {
@@ -153,7 +195,7 @@ export class FireblocksWeb3Provider extends HttpProvider {
 
   private async populateWhitelisted() {
     if (Object.keys(this.whitelisted).length > 0) {
-      throw new Error("Whitelisted already populated");
+      throw this.createError({ message: "Whitelisted already populated" })
     }
 
     await this.assetAndChainIdPopulatedPromise
@@ -191,26 +233,31 @@ export class FireblocksWeb3Provider extends HttpProvider {
     callback: (error: any, response: any) => void
   ): void {
     (async () => {
-      let result = payload.responseText;
+      let result;
       let error = null;
 
       try {
-        await this.initialized()
-
         switch (payload.method) {
           case "eth_requestAccounts":
           case "eth_accounts":
+            await this.accountsPopulatedPromise
             result = Object.values(this.accounts);
             break;
           case "eth_sendTransaction":
-            if (this.gaslessGasTankVaultId != undefined && payload.params[0].from.toLowerCase() != this.gaslessGasTankVaultAddress!.toLowerCase()) {
+            try {
+              if (this.gaslessGasTankVaultId != undefined && payload.params[0].from.toLowerCase() != this.gaslessGasTankVaultAddress!.toLowerCase()) {
               result = this.createGaslessTransaction(payload.params[0]);
             } else {
               result = await this.createContractCall(payload.params[0]);
             }
+            } catch (error) {
+              logEnhancedErrorHandling(`Simulate the failed transaction on Tenderly: ${this.createTenderlySimulationLink(payload.params[0])}`)
+              throw error
+            }
             break;
 
           case "personal_sign":
+          case "eth_sign":
             result = await this.createPersonalSign(payload.params[1], payload.params[0], TransactionOperation.TYPED_MESSAGE, RawMessageType.ETH_MESSAGE);
             break;
 
@@ -223,11 +270,28 @@ export class FireblocksWeb3Provider extends HttpProvider {
 
           case "eth_signTypedData_v2":
           case "eth_signTransaction":
-          case "eth_sign":
-            throw new Error(`JSON-RPC method (${payload.method}) is not implemented in FireblocksWeb3Provider`);
+            throw this.createError({
+              message: `JSON-RPC method (${payload.method}) is not implemented in FireblocksWeb3Provider`,
+              code: 4200,
+              payload,
+            })
+
           default:
-            callback(error, await util.promisify<any, any>(super.send).bind(this)(payload))
-            return;
+            const jsonRpcResponse = await util.promisify<any, any>(super.send).bind(this)(payload)
+
+            if (jsonRpcResponse.error) {
+              if (payload.method == 'eth_estimateGas') {
+                logEnhancedErrorHandling(`Simulate the failed transaction on Tenderly: ${this.createTenderlySimulationLink(payload.params[0])}`)
+              }
+              throw this.createError({
+                message: jsonRpcResponse.error.message,
+                code: jsonRpcResponse.error.code,
+                data: jsonRpcResponse.error.data,
+                payload,
+              })
+            }
+
+            return callback(error, jsonRpcResponse)
         }
       } catch (e) {
         error = e;
@@ -235,6 +299,36 @@ export class FireblocksWeb3Provider extends HttpProvider {
 
       callback(error, formatJsonRpcResult(payload.id, result));
     })();
+  }
+
+  private createTenderlySimulationLink(tx: any): String {
+    const searchParams = new URLSearchParams(JSON.parse(JSON.stringify({
+      ...tx,
+
+      to: undefined,
+      contractAddress: tx.to,
+
+      data: undefined,
+      rawFunctionInput: tx.data || '0x',
+
+      network: this.chainId,
+    })));
+
+    return `https://dashboard.tenderly.co/simulator/new?${searchParams.toString()}`
+  }
+
+  private createError(errorData: { message: string, code?: number, data?: any, payload?: any }): ProviderRpcError {
+    const error = new Error(errorData.message) as ProviderRpcError
+    error.code = errorData.code || -32603
+    error.data = errorData.data
+    error.payload = errorData.payload
+
+    // We do this to avoid including this function in the stack trace
+    if ((Error as any).captureStackTrace !== undefined) {
+      (Error as any).captureStackTrace(error, this.createError);
+    }
+
+    return error
   }
 
   public sendAsync(
@@ -260,17 +354,17 @@ export class FireblocksWeb3Provider extends HttpProvider {
       }
     } else {
       if (!address || address == "0x0") {
-        throw new Error(`Contract deployment is currently not available without enabling one-time addresses`);
+        throw this.createError({ message: "Contract deployment is currently not available without enabling one-time addresses" })
       }
 
-      const whitelistedDesination = this.whitelisted[address.toLowerCase()]
-      if (!whitelistedDesination) {
-        throw new Error(`Address ${address} is not whitelisted. Whitelisted addresses: ${JSON.stringify(this.whitelisted, undefined, 4)}`)
+      const whitelistedDestination = this.whitelisted[address.toLowerCase()]
+      if (!whitelistedDestination) {
+        throw this.createError({ message: `Address ${address} is not whitelisted. Whitelisted addresses: ${JSON.stringify(this.whitelisted, undefined, 4)}` })
       }
 
       return {
-        type: whitelistedDesination.type as PeerType,
-        id: whitelistedDesination.id,
+        type: whitelistedDestination.type as PeerType,
+        id: whitelistedDestination.id,
       }
     }
   }
@@ -279,9 +373,11 @@ export class FireblocksWeb3Provider extends HttpProvider {
     const vaultAccountId = this.getVaultAccountId(address);
 
     if (isNaN(vaultAccountId)) {
-      throw new Error(`${errorMessage}${address}. 
+      throw this.createError({
+        message: `${errorMessage}${address}. 
 ${!this.config.vaultAccountIds ? "vaultAccountIds was not provided in the configuration. When that happens, the provider loads the first 20 vault accounts found. It is advised to explicitly pass the required vaultAccountIds in the configuration to the provider." : `vaultAccountIds provided in the configuration: ${this.vaultAccountIds!.join(", ")}`}.
-Available addresses: ${Object.values(this.accounts).join(', ')}.`);
+Available addresses: ${Object.values(this.accounts).join(', ')}.`
+      })
     }
 
     return vaultAccountId
@@ -336,14 +432,65 @@ Available addresses: ${Object.values(this.accounts).join(', ')}.`);
 
     return relayedTx.hash
   }
-
+  
   private async createContractCall(transaction: any) {
     if (transaction.chainId && transaction.chainId != this.chainId) {
-      throw new Error(`Chain ID of the transaction (${transaction.chainId}) does not match the chain ID of the FireblocksWeb3Provider (${this.chainId})`);
+      throw this.createError({ message: `Chain ID of the transaction (${transaction.chainId}) does not match the chain ID of the FireblocksWeb3Provider (${this.chainId})` })
     }
 
     if (!transaction.from) {
-      throw new Error(`Transaction sent with no "from" field`);
+      throw this.createError({ message: `Transaction sent with no "from" field` })
+    }
+
+    const { data, from, to } = transaction
+
+    const ethersProvider = new ethers.providers.Web3Provider(this)
+    const NativeMetaTransactionContract = NativeMetaTransaction__factory.connect(to, ethersProvider.getSigner(this.gaslessGasTankVaultAddress))
+
+    const nonce = Number(await NativeMetaTransactionContract.getNonce(from))
+    const name = await NativeMetaTransactionContract.name()
+    const version = await NativeMetaTransactionContract.ERC712_VERSION()
+
+    const req = {
+      nonce,
+      from: from,
+      functionSignature: data,
+    };
+
+    const domain = {
+      name,
+      version,
+      // @ts-ignore
+      salt: ethers.utils.hexZeroPad(this.chainId, 32),
+      verifyingContract: to,
+    }
+
+    const types = {
+      MetaTransaction: [
+        { name: 'nonce', type: 'uint256' },
+        { name: 'from', type: 'address' },
+        { name: 'functionSignature', type: 'bytes' },
+      ],
+    }
+    const signature = ethers.utils.splitSignature(await ethersProvider.getSigner(from)._signTypedData(
+      domain,
+      types,
+      req
+    ));
+
+    const relayedTx = await NativeMetaTransactionContract.executeMetaTransaction(from, data, signature.r, signature.s, signature.v)
+
+    return relayedTx.hash
+  }
+
+  private async createContractCall(transaction: any) {
+    await this.initialized()
+    if (transaction.chainId && transaction.chainId != this.chainId) {
+      throw this.createError({ message: `Chain ID of the transaction (${transaction.chainId}) does not match the chain ID of the FireblocksWeb3Provider (${this.chainId})` })
+    }
+
+    if (!transaction.from) {
+      throw this.createError({ message: `Transaction sent with no "from" field` })
     }
 
     const vaultAccountId = this.getVaultAccountIdAndValidateExistence(transaction.from, `Transaction sent from an unsupported address: `);
@@ -383,6 +530,7 @@ Available addresses: ${Object.values(this.accounts).join(', ')}.`);
   }
 
   private async createPersonalSign(address: string, content: any, operation: TransactionOperation, type: RawMessageType): Promise<string> {
+    await this.initialized()
     const vaultAccountId = this.getVaultAccountIdAndValidateExistence(address, `Signature request from an unsupported address: `);
 
     let finalContent = content;
@@ -437,20 +585,24 @@ Available addresses: ${Object.values(this.accounts).join(', ')}.`);
     const { id } = await this.fireblocksApiClient.createTransaction(transactionArguments);
 
     let txInfo: TransactionResponse;
-    let currentStatus: TransactionStatus = TransactionStatus.QUEUED;
+    let currentStatus: TransactionStatus = TransactionStatus.SUBMITTED;
 
     while (!FINAL_TRANSACTION_STATES.includes(currentStatus)) {
       try {
         txInfo = await this.fireblocksApiClient.getTransactionById(id);
+
+        if (currentStatus != txInfo.status) {
+          logTransactionStatusChange(`Fireblocks transaction ${txInfo.id} changed status from ${currentStatus} to ${txInfo.status} ${txInfo.subStatus ? `(${txInfo.subStatus})` : ''}`)
+        }
         currentStatus = txInfo.status;
       } catch (err) {
-        console.log("error:", err);
+        console.error(this.createFireblocksError(err));
       }
       await new Promise(r => setTimeout(r, this.pollingInterval));
     }
 
-    if (currentStatus != TransactionStatus.COMPLETED) {
-      throw new Error(`Transaction was not completed successfully. Final Status: ${currentStatus}`);
+    if (!FINAL_SUCCESSFUL_TRANSACTION_STATES.includes(currentStatus)) {
+      throw this.createError({ message: `Fireblocks transaction ${txInfo!.id || ''} was not completed successfully. Final Status: ${currentStatus} ${txInfo!?.subStatus ? `(${txInfo!?.subStatus})` : ''}` })
     }
 
     return txInfo!
