@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v1.2.0](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.1.5...v1.2.0)
+
+> 24 February 2023
+
+- Initial gasless transactions support [`#8`](https://github.com/fireblocks/fireblocks-web3-provider/pull/8)
+- release 1.1.5 [`914121c`](https://github.com/fireblocks/fireblocks-web3-provider/commit/914121cb5e341df676d691851f62a55cd7c4353a)
+
 #### [v1.1.5](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.1.4...v1.1.5)
 
 > 23 February 2023
