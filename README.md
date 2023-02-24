@@ -141,8 +141,11 @@ type FireblocksProviderConfig = {
    * Same as setting env var `DEBUG=fireblocks-web3-provider:error`
    */
   enhancedErrorHandling?: boolean,
-  // By default, no contracts are interacted with gaslessly
-  // By setting a gaslessGasTankVaultId, all transactions will be sent gaslessly, relayed via the provided vault account
+  /**
+   * By default, no contracts are interacted with gaslessly
+   * By setting a gaslessGasTankVaultId, all transactions will be sent gaslessly, 
+   * relayed via the provided vault account
+   */
   gaslessGasTankVaultId?: number,
 }
 ```
