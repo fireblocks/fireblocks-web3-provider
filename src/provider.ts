@@ -241,7 +241,8 @@ export class FireblocksWeb3Provider extends HttpProvider {
           case "eth_requestAccounts":
           case "eth_accounts":
             await this.accountsPopulatedPromise
-            result = Object.values(this.accounts);
+            result = Object.values(this.accounts)
+              .filter((addr: any) => addr.toLowerCase() != (this.gaslessGasTankVaultAddress || '').toLowerCase())
             break;
           case "eth_sendTransaction":
             try {
