@@ -244,6 +244,7 @@ export class FireblocksWeb3Provider extends HttpProvider {
             result = Object.values(this.accounts)
               .filter((addr: any) => addr.toLowerCase() != (this.gaslessGasTankVaultAddress || '').toLowerCase())
             break;
+
           case "eth_sendTransaction":
             try {
               if (this.gaslessGasTankVaultId != undefined && payload.params[0].from.toLowerCase() != this.gaslessGasTankVaultAddress!.toLowerCase()) {
