@@ -48,12 +48,15 @@ export class FireblocksWeb3Provider extends HttpProvider {
     if (!asset && !config.rpcUrl) {
       throw Error(`Unsupported chain id: ${config.chainId}.\nSupported chains ids: ${Object.keys(ChainId).join(', ')}\nIf you're using a private blockchain, you can specify the blockchain's Fireblocks Asset ID via the "assetId" config param.`);
     }
+
+    let debugNamespaces = [process.env.DEBUG || ''];
     if (config.logTransactionStatusChanges) {
-      Debug.enable(DEBUG_NAMESPACE_TX_STATUS_CHANGES)
+      debugNamespaces.push(DEBUG_NAMESPACE_TX_STATUS_CHANGES)
     }
     if (config.enhancedErrorHandling || config.enhancedErrorHandling == undefined) {
-      Debug.enable(DEBUG_NAMESPACE_ENHANCED_ERROR_HANDLING)
+      debugNamespaces.push(DEBUG_NAMESPACE_ENHANCED_ERROR_HANDLING)
     }
+    Debug.enable(debugNamespaces.join(','))
 
     super(config.rpcUrl || asset.rpcUrl)
 
@@ -166,11 +169,13 @@ export class FireblocksWeb3Provider extends HttpProvider {
         throw this.createFireblocksError(error)
       }
 
-      if (depositAddresses.length == 0) {
+      if (this.config.vaultAccountIds && depositAddresses.length == 0) {
         throw this.createError({ message: `No ${this.assetId} asset wallet found for vault account with id ${vaultAccountId}` })
       }
 
-      this.accounts[vaultAccountId] = depositAddresses[0].address;
+      if (depositAddresses.length) {
+        this.accounts[vaultAccountId] = depositAddresses[0].address;
+      }
     }
   }
 
