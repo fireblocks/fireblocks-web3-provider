@@ -28,7 +28,7 @@ export class FireblocksWeb3Provider extends HttpProvider {
   private note: string;
   private externalTxId: (() => string) | string | undefined;
   private gaslessGasTankVaultId?: number;
-  private gaslessGasTankVaultAddress?: string;
+  private gaslessGasTankVaultAddress: string = '';
   private accountsPopulatedPromise: Promise<void>;
   private pollingInterval: number;
   private oneTimeAddressesEnabled: boolean;
@@ -241,13 +241,15 @@ export class FireblocksWeb3Provider extends HttpProvider {
           case "eth_requestAccounts":
           case "eth_accounts":
             await this.accountsPopulatedPromise
+            await this.gaslessGasTankAddressPopulatedPromise
             result = Object.values(this.accounts)
-              .filter((addr: any) => addr.toLowerCase() != (this.gaslessGasTankVaultAddress || '').toLowerCase())
+              .filter((addr: any) => addr.toLowerCase() != this.gaslessGasTankVaultAddress.toLowerCase())
             break;
 
           case "eth_sendTransaction":
+            await this.gaslessGasTankAddressPopulatedPromise
             try {
-              if (this.gaslessGasTankVaultId != undefined && payload.params[0].from.toLowerCase() != this.gaslessGasTankVaultAddress!.toLowerCase()) {
+              if (this.gaslessGasTankVaultId != undefined && payload.params[0].from.toLowerCase() != this.gaslessGasTankVaultAddress.toLowerCase()) {
                 result = this.createGaslessTransaction(payload.params[0]);
               } else {
                 result = await this.createContractCall(payload.params[0]);
@@ -386,6 +388,7 @@ Available addresses: ${Object.values(this.accounts).join(', ')}.`
   }
 
   private async createGaslessTransaction(transaction: any) {
+    await this.initialized()
     if (transaction.chainId && transaction.chainId != this.chainId) {
       throw new Error(`Chain ID of the transaction (${transaction.chainId}) does not match the chain ID of the FireblocksWeb3Provider (${this.chainId})`);
     }
