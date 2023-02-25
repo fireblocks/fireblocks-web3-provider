@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v1.2.1](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.2.0...v1.2.1)
+
+> 25 February 2023
+
+- Fix debug namespaces overriding [`12094bd`](https://github.com/fireblocks/fireblocks-web3-provider/commit/12094bd2918afdcaa6887ceec0cda3b36215baf8)
+- release 1.2.0 [`dd63e9e`](https://github.com/fireblocks/fireblocks-web3-provider/commit/dd63e9e6728bbd94d3c099b89a0b66636926ba87)
+- Fix gasless race condition [`a5fa7a5`](https://github.com/fireblocks/fireblocks-web3-provider/commit/a5fa7a5b91fc8ee0ea775772a0057e85b4b6293a)
+
 #### [v1.2.0](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.1.5...v1.2.0)
 
 > 24 February 2023
