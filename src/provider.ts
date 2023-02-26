@@ -85,7 +85,7 @@ export class FireblocksWeb3Provider extends HttpProvider {
   }
 
   private parsePrivateKey(privateKey: string): string {
-    if (privateKey.startsWith('/') || privateKey.startsWith('./')) {
+    if (!privateKey.trim().startsWith('-----BEGIN')) {
       return readFileSync(privateKey, 'utf8')
     } else {
       return privateKey
