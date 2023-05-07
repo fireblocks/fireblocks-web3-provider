@@ -79,5 +79,7 @@ export type FireblocksProviderConfig = {
   // By default, no contracts are interacted with gaslessly
   // You can either provide a list of contract addresses, or set it to "all" to interact with all contracts gaslessly
   gaslessContracts?: string[] | "all",
+  // By default, http://localhost:7777/relayGaslessTransaction is used
+  gaslessRelayServerUrl?: string,
 }
 ```

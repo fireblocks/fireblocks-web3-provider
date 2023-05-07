@@ -329,7 +329,7 @@ Available addresses: ${Object.values(this.accounts).join(', ')}.`);
       signature,
     }
 
-    const { txHash, success, error } = await fetch('http://localhost:7777/relayGaslessTransaction', {
+    const { txHash, success, error } = await fetch(this.config.gaslessRelayServerUrl || 'http://localhost:7777/relayGaslessTransaction', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
