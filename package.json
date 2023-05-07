@@ -34,7 +34,8 @@
     "dist/",
     "src/",
     "LICENSE",
-    "README.md"
+    "README.md",
+    "tsconfig.json"
   ],
   "devDependencies": {
     "@types/chai": "4.3.1",
