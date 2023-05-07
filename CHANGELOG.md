@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v1.2.2](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.2.1...v1.2.2)
+
+> 7 May 2023
+
+- added rpcURL and sepolia mappings [`#10`](https://github.com/fireblocks/fireblocks-web3-provider/pull/10)
+- release 1.2.1 [`f21a6bd`](https://github.com/fireblocks/fireblocks-web3-provider/commit/f21a6bd7a5fb2fd0023f68725f22151f52e9852a)
+- Fix config parsing bug [`be52edc`](https://github.com/fireblocks/fireblocks-web3-provider/commit/be52edc720c66d8137a29f74aa3764d526731e06)
+
 #### [v1.2.1](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.2.0...v1.2.1)
 
 > 25 February 2023
