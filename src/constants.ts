@@ -7,6 +7,7 @@ export const ASSETS: { [key: string]: Asset } = {
   [ChainId.KOVAN]: { assetId: 'ETH_TEST2', rpcUrl: "https://kovan.poa.network" },
   [ChainId.GOERLI]: { assetId: 'ETH_TEST3', rpcUrl: "https://rpc.ankr.com/eth_goerli" },
   [ChainId.RINKEBY]: { assetId: 'ETH_TEST4', rpcUrl: "https://rpc.ankr.com/eth_rinkeby" },
+  [ChainId.SEPOLIA]: { assetId: 'ETH_TEST5', rpcUrl: "https://rpc.sepolia.org" },
   [ChainId.BSC]: { assetId: 'BNB_BSC', rpcUrl: "https://bsc-dataseed.binance.org" },
   [ChainId.BSC_TEST]: { assetId: 'BNB_TEST', rpcUrl: "https://data-seed-prebsc-1-s1.binance.org:8545" },
   [ChainId.POLYGON]: { assetId: 'MATIC_POLYGON', rpcUrl: "https://polygon-rpc.com" },

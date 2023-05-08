@@ -6,6 +6,7 @@ export enum ChainId {
   KOVAN = 42,
   GOERLI = 5,
   RINKEBY = 4,
+  SEPOLIA = 11155111,
   BSC = 56,
   BSC_TEST = 97,
   POLYGON = 137,
