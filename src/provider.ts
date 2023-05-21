@@ -1,6 +1,6 @@
 import util from "util";
 import { DestinationTransferPeerPath, FeeLevel, FireblocksSDK, TransactionArguments, TransactionResponse, TransactionStatus } from "fireblocks-sdk";
-import { getAssetByChain } from "./utils";
+import { getAssetByChain, promiseToFunction } from "./utils";
 import { readFileSync } from "fs";
 import { ApiBaseUrl, ChainId, FireblocksProviderConfig, ProviderRpcError, RawMessageType, RequestArguments } from "./types";
 import { PeerType, TransactionOperation } from "fireblocks-sdk";
@@ -78,10 +78,10 @@ export class FireblocksWeb3Provider extends HttpProvider {
     this.oneTimeAddressesEnabled = config.oneTimeAddressesEnabled ?? true
     this.chainId = config.chainId
     this.assetId = asset?.assetId
-    this.assetAndChainIdPopulatedPromise = async () => { if (!this.chainId) await this.populateAssetAndChainId() }
-    this.accountsPopulatedPromise = async () => { await this.populateAccounts() }
-    this.whitelistedPopulatedPromise = async () => { if (!this.oneTimeAddressesEnabled) await this.populateWhitelisted() }
-    this.gaslessGasTankAddressPopulatedPromise = async () => { if (this.gaslessGasTankVaultId) await this.populateGaslessGasTankAddress() }
+    this.assetAndChainIdPopulatedPromise = promiseToFunction(async () => { if (!this.chainId) return await this.populateAssetAndChainId() })
+    this.accountsPopulatedPromise = promiseToFunction(async () => { return await this.populateAccounts() })
+    this.whitelistedPopulatedPromise = promiseToFunction(async () => { if (!this.oneTimeAddressesEnabled) return await this.populateWhitelisted() })
+    this.gaslessGasTankAddressPopulatedPromise = promiseToFunction(async () => { if (this.gaslessGasTankVaultId) return await this.populateGaslessGasTankAddress() })
   }
 
   private parsePrivateKey(privateKey: string): string {
