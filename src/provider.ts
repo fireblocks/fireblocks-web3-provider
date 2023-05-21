@@ -1,6 +1,6 @@
 import util from "util";
 import { DestinationTransferPeerPath, FeeLevel, FireblocksSDK, TransactionArguments, TransactionResponse, TransactionStatus } from "fireblocks-sdk";
-import { getAssetByChain } from "./utils";
+import { getAssetByChain, promiseToFunction } from "./utils";
 import { readFileSync } from "fs";
 import { ApiBaseUrl, ChainId, FireblocksProviderConfig, ProviderRpcError, RawMessageType, RequestArguments } from "./types";
 import { PeerType, TransactionOperation } from "fireblocks-sdk";
@@ -29,13 +29,13 @@ export class FireblocksWeb3Provider extends HttpProvider {
   private externalTxId: (() => string) | string | undefined;
   private gaslessGasTankVaultId?: number;
   private gaslessGasTankVaultAddress: string = '';
-  private accountsPopulatedPromise: Promise<void>;
+  private accountsPopulatedPromise: () => Promise<void>;
   private pollingInterval: number;
   private oneTimeAddressesEnabled: boolean;
   private whitelisted: { [address: string]: { type: string, id: string } } = {};
-  private whitelistedPopulatedPromise: Promise<void>;
-  private assetAndChainIdPopulatedPromise: Promise<void>;
-  private gaslessGasTankAddressPopulatedPromise: Promise<void>;
+  private whitelistedPopulatedPromise: () => Promise<void>;
+  private assetAndChainIdPopulatedPromise: () => Promise<void>;
+  private gaslessGasTankAddressPopulatedPromise: () => Promise<void>;
 
   constructor(config: FireblocksProviderConfig) {
     if (config.assetId && !config.rpcUrl) {
@@ -78,10 +78,10 @@ export class FireblocksWeb3Provider extends HttpProvider {
     this.oneTimeAddressesEnabled = config.oneTimeAddressesEnabled ?? true
     this.chainId = config.chainId
     this.assetId = asset?.assetId
-    this.assetAndChainIdPopulatedPromise = this.chainId ? Promise.resolve() : this.populateAssetAndChainId()
-    this.accountsPopulatedPromise = this.populateAccounts()
-    this.whitelistedPopulatedPromise = this.oneTimeAddressesEnabled ? Promise.resolve() : this.populateWhitelisted()
-    this.gaslessGasTankAddressPopulatedPromise = this.gaslessGasTankVaultId == undefined ? Promise.resolve() : this.populateGaslessGasTankAddress()
+    this.assetAndChainIdPopulatedPromise = promiseToFunction(async () => { if (!this.chainId) return await this.populateAssetAndChainId() })
+    this.accountsPopulatedPromise = promiseToFunction(async () => { return await this.populateAccounts() })
+    this.whitelistedPopulatedPromise = promiseToFunction(async () => { if (!this.oneTimeAddressesEnabled) return await this.populateWhitelisted() })
+    this.gaslessGasTankAddressPopulatedPromise = promiseToFunction(async () => { if (this.gaslessGasTankVaultId) return await this.populateGaslessGasTankAddress() })
   }
 
   private parsePrivateKey(privateKey: string): string {
@@ -93,7 +93,7 @@ export class FireblocksWeb3Provider extends HttpProvider {
   }
 
   private async populateGaslessGasTankAddress(): Promise<void> {
-    await this.assetAndChainIdPopulatedPromise
+    await this.assetAndChainIdPopulatedPromise()
     const depositAddresses = await this.fireblocksApiClient.getDepositAddresses(this.gaslessGasTankVaultId!.toString(), this.assetId!)
     if (depositAddresses.length === 0) {
       throw Error(`Gasless gas tank vault not found (vault id: ${this.gaslessGasTankVaultId})`)
@@ -123,7 +123,7 @@ export class FireblocksWeb3Provider extends HttpProvider {
   }
 
   private async getVaultAccounts(): Promise<number[]> {
-    await this.assetAndChainIdPopulatedPromise
+    await this.assetAndChainIdPopulatedPromise()
 
     return (await this.fireblocksApiClient.getVaultAccountsWithPageInfo(
       {
@@ -159,7 +159,7 @@ export class FireblocksWeb3Provider extends HttpProvider {
       this.vaultAccountIds = await this.getVaultAccounts()
     }
 
-    await this.assetAndChainIdPopulatedPromise
+    await this.assetAndChainIdPopulatedPromise()
 
     for (const vaultAccountId of this.vaultAccountIds) {
       let depositAddresses
@@ -203,7 +203,7 @@ export class FireblocksWeb3Provider extends HttpProvider {
       throw this.createError({ message: "Whitelisted already populated" })
     }
 
-    await this.assetAndChainIdPopulatedPromise
+    await this.assetAndChainIdPopulatedPromise()
 
     const [externalWallets, internalWallets, contractWallets] = await Promise.all([
       this.getWhitelistedWallets(this.fireblocksApiClient.getExternalWallets(), PeerType.EXTERNAL_WALLET, this.assetId!),
@@ -211,7 +211,7 @@ export class FireblocksWeb3Provider extends HttpProvider {
       this.getWhitelistedWallets(this.fireblocksApiClient.getContractWallets(), PeerType.EXTERNAL_WALLET, this.assetId!),
     ])
 
-    await this.accountsPopulatedPromise
+    await this.accountsPopulatedPromise()
 
     const vaultWallets = Object.entries(this.accounts).map(([id, address]) => ({
       type: PeerType.VAULT_ACCOUNT,
@@ -227,10 +227,14 @@ export class FireblocksWeb3Provider extends HttpProvider {
   }
 
   private async initialized() {
-    await this.assetAndChainIdPopulatedPromise
-    await this.accountsPopulatedPromise
-    await this.whitelistedPopulatedPromise
-    await this.gaslessGasTankAddressPopulatedPromise
+    await Promise.all(
+      [
+        this.assetAndChainIdPopulatedPromise(),
+        this.accountsPopulatedPromise(),
+        this.whitelistedPopulatedPromise(),
+        this.gaslessGasTankAddressPopulatedPromise(),
+      ]
+    )
   }
 
   public send(
@@ -245,14 +249,14 @@ export class FireblocksWeb3Provider extends HttpProvider {
         switch (payload.method) {
           case "eth_requestAccounts":
           case "eth_accounts":
-            await this.accountsPopulatedPromise
-            await this.gaslessGasTankAddressPopulatedPromise
+            await this.accountsPopulatedPromise()
+            await this.gaslessGasTankAddressPopulatedPromise()
             result = Object.values(this.accounts)
               .filter((addr: any) => addr.toLowerCase() != this.gaslessGasTankVaultAddress.toLowerCase())
             break;
 
           case "eth_sendTransaction":
-            await this.gaslessGasTankAddressPopulatedPromise
+            await this.gaslessGasTankAddressPopulatedPromise()
             try {
               if (this.gaslessGasTankVaultId != undefined && payload.params[0].from.toLowerCase() != this.gaslessGasTankVaultAddress.toLowerCase()) {
                 result = this.createGaslessTransaction(payload.params[0]);
