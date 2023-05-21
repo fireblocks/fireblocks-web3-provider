@@ -85,6 +85,10 @@ export class FireblocksWeb3Provider extends HttpProvider {
   }
 
   private parsePrivateKey(privateKey: string): string {
+    if (!privateKey) {
+      throw Error(`privateKey is required in the fireblocks-web3-provider config`)
+    }
+
     if (!privateKey.trim().startsWith('-----BEGIN')) {
       return readFileSync(privateKey, 'utf8')
     } else {
