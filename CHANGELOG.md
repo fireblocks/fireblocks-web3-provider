@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v1.2.3](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.2.2...v1.2.3)
+
+> 21 May 2023
+
+- 🐛 fix floating promises in provider [`#12`](https://github.com/fireblocks/fireblocks-web3-provider/pull/12)
+- release 1.2.2 [`971e19c`](https://github.com/fireblocks/fireblocks-web3-provider/commit/971e19c3d24c90e4531cfb190ac8539619f8a2d6)
+
 #### [v1.2.2](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.2.1...v1.2.2)
 
 > 7 May 2023
