@@ -329,6 +329,9 @@ export class FireblocksWeb3Provider extends HttpProvider {
       rawFunctionInput: tx.data || '0x',
 
       network: this.chainId,
+
+      gasPrice: tx.gasPrice ? Number(tx.gasPrice) : undefined,
+      gas: tx.gas ? Number(tx.gas) : undefined,
     })));
 
     return `https://dashboard.tenderly.co/simulator/new?${searchParams.toString()}`
