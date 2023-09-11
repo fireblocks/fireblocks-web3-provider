@@ -58,9 +58,23 @@ export class FireblocksWeb3Provider extends HttpProvider {
     }
     Debug.enable(debugNamespaces.join(','))
 
+    let headers;
+
+    if (config.rpcUrl && config.rpcUrl.includes("@") && config.rpcUrl.includes(":")) {
+      const [creds, url] = config.rpcUrl.replace("https://", "").replace("http://", "").split("@");
+      config.rpcUrl = `${config.rpcUrl.startsWith("https") ? "https://" : "http://"}${url}`;
+      headers = [
+        {
+          name: "Authorization",
+          value: Buffer.from(creds).toString('base64')
+        }
+      ];
+    }
+
     super(config.rpcUrl || asset.rpcUrl)
 
     this.config = config
+    this.headers = headers;
     this.fireblocksApiClient = new FireblocksSDK(
       this.parsePrivateKey(config.privateKey),
       config.apiKey,
