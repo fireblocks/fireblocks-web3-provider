@@ -20,6 +20,7 @@ const logEnhancedErrorHandling = Debug(DEBUG_NAMESPACE_ENHANCED_ERROR_HANDLING);
 export class FireblocksWeb3Provider extends HttpProvider {
   private fireblocksApiClient: FireblocksSDK;
   private config: FireblocksProviderConfig;
+  private headers: { name: string, value: string }[] = [];
   private accounts: { [vaultId: number]: string } = {};
   private vaultAccountIds?: number[];
   private assetId?: string;
@@ -58,23 +59,23 @@ export class FireblocksWeb3Provider extends HttpProvider {
     }
     Debug.enable(debugNamespaces.join(','))
 
-    let headers;
+    let headers: { name: string, value: string }[] = [];
 
     if (config.rpcUrl && config.rpcUrl.includes("@") && config.rpcUrl.includes(":")) {
       const [creds, url] = config.rpcUrl.replace("https://", "").replace("http://", "").split("@");
       config.rpcUrl = `${config.rpcUrl.startsWith("https") ? "https://" : "http://"}${url}`;
-      headers = [
+      headers.push(
         {
           name: "Authorization",
           value: Buffer.from(creds).toString('base64')
         }
-      ];
+      );
     }
 
     super(config.rpcUrl || asset.rpcUrl)
 
     this.config = config
-    this.headers = headers;
+    this.headers.push(headers[0]);
     this.fireblocksApiClient = new FireblocksSDK(
       this.parsePrivateKey(config.privateKey),
       config.apiKey,
