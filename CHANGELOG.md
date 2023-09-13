@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v1.2.4](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.2.3...v1.2.4)
+
+> 13 September 2023
+
+- fix: added support for http basic authentication [`#14`](https://github.com/fireblocks/fireblocks-web3-provider/pull/14)
+- Move ethers dependency from dev [`651641f`](https://github.com/fireblocks/fireblocks-web3-provider/commit/651641ff76ab1598b305df495d1edee95f72d486)
+- release 1.2.3 [`dfca083`](https://github.com/fireblocks/fireblocks-web3-provider/commit/dfca0833e668360ea0c403b5f7214e9c3e1e17d5)
+- Throw with clear error if `privateKey` is not provided [`dcb73f2`](https://github.com/fireblocks/fireblocks-web3-provider/commit/dcb73f289d35ab83456cc992b27643afdd73d8e7)
+- Update to new Tenderly url encoding [`47812b1`](https://github.com/fireblocks/fireblocks-web3-provider/commit/47812b190399fe95912117408936b7032220bfe4)
+
 #### [v1.2.3](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.2.2...v1.2.3)
 
 > 21 May 2023
