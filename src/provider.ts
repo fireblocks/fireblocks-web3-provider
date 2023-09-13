@@ -50,7 +50,7 @@ export class FireblocksWeb3Provider extends HttpProvider {
       throw Error(`Unsupported chain id: ${config.chainId}.\nSupported chains ids: ${Object.keys(ChainId).join(', ')}\nIf you're using a private blockchain, you can specify the blockchain's Fireblocks Asset ID via the "assetId" config param.`);
     }
 
-    let debugNamespaces = [process.env.DEBUG || ''];
+    const debugNamespaces = [process.env.DEBUG || '']
     if (config.logTransactionStatusChanges) {
       debugNamespaces.push(DEBUG_NAMESPACE_TX_STATUS_CHANGES)
     }
@@ -59,8 +59,7 @@ export class FireblocksWeb3Provider extends HttpProvider {
     }
     Debug.enable(debugNamespaces.join(','))
 
-    let headers: { name: string, value: string }[] = [];
-
+    const headers: { name: string, value: string }[] = []
     if (config.rpcUrl && config.rpcUrl.includes("@") && config.rpcUrl.includes(":")) {
       const [creds, url] = config.rpcUrl.replace("https://", "").replace("http://", "").split("@");
       config.rpcUrl = `${config.rpcUrl.startsWith("https") ? "https://" : "http://"}${url}`;
@@ -75,7 +74,7 @@ export class FireblocksWeb3Provider extends HttpProvider {
     super(config.rpcUrl || asset.rpcUrl)
 
     this.config = config
-    this.headers.push(headers[0]);
+    this.headers = headers;
     this.fireblocksApiClient = new FireblocksSDK(
       this.parsePrivateKey(config.privateKey),
       config.apiKey,
