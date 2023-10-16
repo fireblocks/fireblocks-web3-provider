@@ -272,6 +272,11 @@ export class FireblocksWeb3Provider extends HttpProvider {
       try {
         logRequestsAndResponses(`Request #${requestNumber}: method=${payload.method} params=${JSON.stringify(payload.params, undefined, 4)}`)
 
+        if (payload?.params?.[0]?.input && !payload?.params?.[0]?.data) {
+          payload.params[0].data = payload.params?.[0].input
+          delete payload.params?.[0].input
+        }
+
         switch (payload.method) {
           case "eth_requestAccounts":
           case "eth_accounts":

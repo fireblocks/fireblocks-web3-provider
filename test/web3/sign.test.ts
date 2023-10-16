@@ -67,22 +67,21 @@ describe("Web3: Should be able to sign using Fireblocks", function () {
     }
     const primaryType = "Permit"
 
-    const data = JSON.stringify({
+    const data = {
       types,
       domain,
       message,
       primaryType,
-    });
+    };
 
-    // @ts-ignore
-    const signature = await web3.currentProvider.request({
+    const signature = await web3.currentProvider?.request({
       method: "eth_signTypedData_v4",
       params: [signerAddress, data],
     })
 
     // @ts-ignore
     delete types.EIP712Domain
-    const recoveredAddress = ethers.utils.verifyTypedData(domain, types, message, signature);
+    const recoveredAddress = ethers.utils.verifyTypedData(domain, types, message, signature as any);
 
     expect(recoveredAddress).to.be.equals(signerAddress)
   })

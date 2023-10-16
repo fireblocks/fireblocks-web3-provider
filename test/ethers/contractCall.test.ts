@@ -62,7 +62,7 @@ describe("Ethers: Should be able to call a contract method", function () {
     const firstAddressWithBalance = await getFirstAddressWithBalance()
     const tx = await greeterContract.connect(provider.getSigner(firstAddressWithBalance)).setGreeting(greeting)
 
-    tx.wait()
+    await tx.wait()
 
     expect(tx.hash).to.be.not.undefined
   })

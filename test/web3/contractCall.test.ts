@@ -27,7 +27,7 @@ const GREETER_ABI = [
     ],
     "outputs": []
   }
-]
+] as const
 const provider = getWeb3FireblocksProviderForTesting()
 const greeting = (new Date()).toISOString()
 // @ts-ignore
@@ -59,7 +59,7 @@ describe("Web3: Should be able to call a contract method", function () {
 
     expect(receipt.transactionHash).to.be.not.undefined
   })
-  
+
   it("greet() after", async function () {
     const currentGreeting = await greeterContract.methods.greet().call()
 
