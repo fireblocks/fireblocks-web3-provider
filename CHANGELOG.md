@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v1.2.5](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.2.4...v1.2.5)
+
+> 16 October 2023
+
+- Support web3.js v4 (`input` instead of `data`) [`c8b4c9a`](https://github.com/fireblocks/fireblocks-web3-provider/commit/c8b4c9afc15eab0328ef79eb1dc9e1510af75d14)
+- Add contract call tests [`ea875fb`](https://github.com/fireblocks/fireblocks-web3-provider/commit/ea875fb4bf79936c7e2f85121534a847bae6105a)
+- Add `logRequestsAndResponses` flag [`622c31a`](https://github.com/fireblocks/fireblocks-web3-provider/commit/622c31a6419d96349f1ec3a863dd3cfc78f87319)
+
 #### [v1.2.4](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.2.3...v1.2.4)
 
 > 13 September 2023
