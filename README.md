@@ -135,6 +135,12 @@ type FireblocksProviderConfig = {
    */
   logTransactionStatusChanges?: boolean,
   /**
+   * Default: false
+   * By setting to true, every request and response processed by the provider will be logged to the console
+   * Same as setting env var `DEBUG=fireblocks-web3-provider:req_res`
+   */
+  logRequestsAndResponses?: boolean,
+  /**
    * Default: true
    * By setting to true, every failed transaction will print additional information
    * helpful for debugging, such as a link to simulate the transaction on Tenderly

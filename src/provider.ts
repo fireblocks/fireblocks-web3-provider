@@ -5,7 +5,7 @@ import { readFileSync } from "fs";
 import { ApiBaseUrl, ChainId, FireblocksProviderConfig, ProviderRpcError, RawMessageType, RequestArguments } from "./types";
 import { PeerType, TransactionOperation } from "fireblocks-sdk";
 import { formatEther, formatUnits, parseEther } from "@ethersproject/units";
-import { DEBUG_NAMESPACE, DEBUG_NAMESPACE_ENHANCED_ERROR_HANDLING, DEBUG_NAMESPACE_TX_STATUS_CHANGES, FINAL_SUCCESSFUL_TRANSACTION_STATES, FINAL_TRANSACTION_STATES } from "./constants";
+import { DEBUG_NAMESPACE_ENHANCED_ERROR_HANDLING, DEBUG_NAMESPACE_REQUESTS_AND_RESPONSES, DEBUG_NAMESPACE_TX_STATUS_CHANGES, FINAL_SUCCESSFUL_TRANSACTION_STATES, FINAL_TRANSACTION_STATES } from "./constants";
 import * as ethers from "ethers";
 import { NativeMetaTransaction__factory } from "./contracts/factories"
 import { _TypedDataEncoder } from "@ethersproject/hash";
@@ -15,6 +15,7 @@ import Debug from "debug";
 const HttpProvider = require("web3-providers-http");
 const logTransactionStatusChange = Debug(DEBUG_NAMESPACE_TX_STATUS_CHANGES);
 const logEnhancedErrorHandling = Debug(DEBUG_NAMESPACE_ENHANCED_ERROR_HANDLING);
+const logRequestsAndResponses = Debug(DEBUG_NAMESPACE_REQUESTS_AND_RESPONSES);
 
 
 export class FireblocksWeb3Provider extends HttpProvider {
@@ -37,6 +38,7 @@ export class FireblocksWeb3Provider extends HttpProvider {
   private whitelistedPopulatedPromise: () => Promise<void>;
   private assetAndChainIdPopulatedPromise: () => Promise<void>;
   private gaslessGasTankAddressPopulatedPromise: () => Promise<void>;
+  private requestCounter = 0;
 
   constructor(config: FireblocksProviderConfig) {
     if (config.assetId && !config.rpcUrl) {
@@ -56,6 +58,9 @@ export class FireblocksWeb3Provider extends HttpProvider {
     }
     if (config.enhancedErrorHandling || config.enhancedErrorHandling == undefined) {
       debugNamespaces.push(DEBUG_NAMESPACE_ENHANCED_ERROR_HANDLING)
+    }
+    if (config.logRequestsAndResponses) {
+      debugNamespaces.push(DEBUG_NAMESPACE_REQUESTS_AND_RESPONSES)
     }
     Debug.enable(debugNamespaces.join(','))
 
@@ -262,8 +267,11 @@ export class FireblocksWeb3Provider extends HttpProvider {
     (async () => {
       let result;
       let error = null;
+      const requestNumber = ++this.requestCounter;
 
       try {
+        logRequestsAndResponses(`Request #${requestNumber}: method=${payload.method} params=${JSON.stringify(payload.params, undefined, 4)}`)
+
         switch (payload.method) {
           case "eth_requestAccounts":
           case "eth_accounts":
@@ -322,12 +330,17 @@ export class FireblocksWeb3Provider extends HttpProvider {
               })
             }
 
-            return callback(error, jsonRpcResponse)
+            result = jsonRpcResponse.result
         }
       } catch (e) {
         error = e;
       }
-
+      
+      if (error) {
+        logRequestsAndResponses(`Error #${requestNumber}: ${error}`)
+      } else {
+        logRequestsAndResponses(`Response #${requestNumber}: ${JSON.stringify(result, undefined, 4)}`)
+      }
       callback(error, formatJsonRpcResult(payload.id, result));
     })();
   }
