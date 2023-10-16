@@ -84,7 +84,7 @@ export class FireblocksWeb3Provider extends HttpProvider {
         userAgent: this.getUserAgent(),
       })
     this.feeLevel = config.fallbackFeeLevel || FeeLevel.MEDIUM
-    this.note = config.note || 'Created by Fireblocks Web3 Provider'
+    this.note = config.note ?? 'Created by Fireblocks Web3 Provider'
     this.externalTxId = config.externalTxId;
     this.gaslessGasTankVaultId = config.gaslessGasTankVaultId
     this.vaultAccountIds = this.parseVaultAccountIds(config.vaultAccountIds)
