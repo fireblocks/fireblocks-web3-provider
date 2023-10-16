@@ -1,0 +1,24 @@
+name: Test
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16.14.2'
+          registry-url: 'https://registry.npmjs.org'
+      - run: npm install
+      - run: npm test
+        env:
+          FIREBLOCKS_API_KEY: ${{ secrets.FIREBLOCKS_API_KEY }}
+          FIREBLOCKS_API_PRIVATE_KEY_PATH: ${{ secrets.FIREBLOCKS_API_PRIVATE_KEY_PATH }}
+          FIREBLOCKS_API_BASE_URL: ${{ vars.FIREBLOCKS_API_BASE_URL }}
+          FIREBLOCKS_RPC_URL: ${{ vars.FIREBLOCKS_RPC_URL }}
