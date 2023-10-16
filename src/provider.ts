@@ -335,7 +335,7 @@ export class FireblocksWeb3Provider extends HttpProvider {
       } catch (e) {
         error = e;
       }
-      
+
       if (error) {
         logRequestsAndResponses(`Error #${requestNumber}: ${error}`)
       } else {
@@ -360,6 +360,10 @@ export class FireblocksWeb3Provider extends HttpProvider {
       gasPrice: tx.gasPrice ? Number(tx.gasPrice) : undefined,
       gas: tx.gas ? Number(tx.gas) : undefined,
     })));
+
+    if (!searchParams.get('gasPrice') && tx.maxFeePerGas) {
+      searchParams.set('gasPrice', tx.maxFeePerGas)
+    }
 
     return `https://dashboard.tenderly.co/simulator/new?${searchParams.toString()}`
   }
