@@ -7,6 +7,7 @@ export enum ChainId {
   GOERLI = 5,
   RINKEBY = 4,
   SEPOLIA = 11155111,
+  HOLESKY = 17000,
   BSC = 56,
   BSC_TEST = 97,
   POLYGON = 137,
