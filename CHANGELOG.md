@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v1.2.6](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.2.5...v1.2.6)
+
+> 13 November 2023
+
+- release 1.2.5 [`8da1211`](https://github.com/fireblocks/fireblocks-web3-provider/commit/8da1211a6c6083314ac50ee40057e62e68ac6295)
+- Add Holesky testnet [`3cecc8a`](https://github.com/fireblocks/fireblocks-web3-provider/commit/3cecc8a0e22ce1072b47dfe05a584ded93ad23c2)
+
 #### [v1.2.5](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.2.4...v1.2.5)
 
 > 16 October 2023
