@@ -9,6 +9,7 @@ import { DEBUG_NAMESPACE_ENHANCED_ERROR_HANDLING, DEBUG_NAMESPACE_REQUESTS_AND_R
 import * as ethers from "ethers";
 import { NativeMetaTransaction__factory } from "./contracts/factories"
 import { _TypedDataEncoder } from "@ethersproject/hash";
+import { HttpsProxyAgent } from 'https-proxy-agent';
 import { formatJsonRpcRequest, formatJsonRpcResult } from "./jsonRpcUtils";
 import { version as SDK_VERSION } from "../package.json";
 import Debug from "debug";
@@ -87,7 +88,8 @@ export class FireblocksWeb3Provider extends HttpProvider {
       undefined,
       {
         userAgent: this.getUserAgent(),
-      })
+        proxy: config.proxyConfig ?? undefined
+      });
     this.feeLevel = config.fallbackFeeLevel || FeeLevel.MEDIUM
     this.note = config.note ?? 'Created by Fireblocks Web3 Provider'
     this.externalTxId = config.externalTxId;
@@ -101,6 +103,19 @@ export class FireblocksWeb3Provider extends HttpProvider {
     this.accountsPopulatedPromise = promiseToFunction(async () => { return await this.populateAccounts() })
     this.whitelistedPopulatedPromise = promiseToFunction(async () => { if (!this.oneTimeAddressesEnabled) return await this.populateWhitelisted() })
     this.gaslessGasTankAddressPopulatedPromise = promiseToFunction(async () => { if (this.gaslessGasTankVaultId) return await this.populateGaslessGasTankAddress() })
+
+    if (config.proxyConfig) {
+      const proxyConfig = config.proxyConfig!;
+      const protocol = 'http://';
+      const creds = proxyConfig.auth ? proxyConfig.auth.username ? `${proxyConfig.auth.username}${proxyConfig.auth.password ? `:${proxyConfig.auth.password}@` : '@'}` : '' : '';
+      const host = `${proxyConfig.host}:${proxyConfig.port}`;
+      const proxyPath = `${protocol}${creds}${host}`;
+      const proxyAgent = new HttpsProxyAgent(proxyPath);
+      this.agent = {
+        http: proxyAgent,
+        https: proxyAgent
+      }
+    }
   }
 
   private parsePrivateKey(privateKey: string): string {

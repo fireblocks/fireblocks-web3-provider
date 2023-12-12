@@ -84,6 +84,10 @@ type FireblocksProviderConfig = {
    * If not provided, it is inferred from the chainId 
    */
   rpcUrl?: string,
+  /**
+   * Proxy configuration
+   */
+  proxyConfig?: AxiosProxyConfig
 
   // ------------- Optional fields --------------
 
