@@ -73,9 +73,9 @@ export type FireblocksProviderConfig = {
    */
   rpcUrl?: string,
   /**
-   * Proxy configuration
+   * Proxy path in the format of `http(s)://user:pass@server`
    */
-  proxyConfig?: AxiosProxyConfig
+  proxyPath?: string
 
   // ------------- Optional fields --------------
 

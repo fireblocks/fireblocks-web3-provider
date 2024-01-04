@@ -13,6 +13,7 @@ import { HttpsProxyAgent } from 'https-proxy-agent';
 import { formatJsonRpcRequest, formatJsonRpcResult } from "./jsonRpcUtils";
 import { version as SDK_VERSION } from "../package.json";
 import Debug from "debug";
+import { AxiosProxyConfig } from "axios";
 const HttpProvider = require("web3-providers-http");
 const logTransactionStatusChange = Debug(DEBUG_NAMESPACE_TX_STATUS_CHANGES);
 const logEnhancedErrorHandling = Debug(DEBUG_NAMESPACE_ENHANCED_ERROR_HANDLING);
@@ -88,7 +89,7 @@ export class FireblocksWeb3Provider extends HttpProvider {
       undefined,
       {
         userAgent: this.getUserAgent(),
-        proxy: config.proxyConfig ?? undefined
+        proxy: config.proxyPath ? this.toAxiosProxyConfig(config.proxyPath) : undefined
       });
     this.feeLevel = config.fallbackFeeLevel || FeeLevel.MEDIUM
     this.note = config.note ?? 'Created by Fireblocks Web3 Provider'
@@ -104,13 +105,8 @@ export class FireblocksWeb3Provider extends HttpProvider {
     this.whitelistedPopulatedPromise = promiseToFunction(async () => { if (!this.oneTimeAddressesEnabled) return await this.populateWhitelisted() })
     this.gaslessGasTankAddressPopulatedPromise = promiseToFunction(async () => { if (this.gaslessGasTankVaultId) return await this.populateGaslessGasTankAddress() })
 
-    if (config.proxyConfig) {
-      const proxyConfig = config.proxyConfig!;
-      const protocol = 'http://';
-      const creds = proxyConfig.auth ? proxyConfig.auth.username ? `${proxyConfig.auth.username}${proxyConfig.auth.password ? `:${proxyConfig.auth.password}@` : '@'}` : '' : '';
-      const host = `${proxyConfig.host}:${proxyConfig.port}`;
-      const proxyPath = `${protocol}${creds}${host}`;
-      const proxyAgent = new HttpsProxyAgent(proxyPath);
+    if (config.proxyPath) {
+      const proxyAgent = new HttpsProxyAgent(config.proxyPath);
       this.agent = {
         http: proxyAgent,
         https: proxyAgent
@@ -636,5 +632,22 @@ Available addresses: ${Object.values(this.accounts).join(', ')}.`
 
   public setExternalTxId(externalTxId: (() => string) | string | undefined) {
     this.externalTxId = externalTxId;
+  }
+
+  private toAxiosProxyConfig(path: string): AxiosProxyConfig {
+    const proxyUrl = new URL(path);
+
+    if (proxyUrl.pathname != '/') {
+      throw 'Proxy with path is not supported by axios';
+    }
+    return {
+      protocol: proxyUrl.protocol.replace(':', ''),
+      host: proxyUrl.hostname,
+      port: parseInt(proxyUrl.port),
+      auth: proxyUrl.username ? {
+        username: proxyUrl.username,
+        password: proxyUrl.password
+      } : undefined
+    }
   }
 }
