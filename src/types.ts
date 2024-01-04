@@ -72,10 +72,6 @@ export type FireblocksProviderConfig = {
    * If not provided, it is inferred from the chainId 
    */
   rpcUrl?: string,
-  /**
-   * Proxy path in the format of `http(s)://user:pass@server`
-   */
-  proxyPath?: string
 
   // ------------- Optional fields --------------
 
@@ -147,6 +143,11 @@ export type FireblocksProviderConfig = {
    * relayed via the provided vault account
    */
   gaslessGasTankVaultId?: number,
+
+/**
+ * Proxy path in the format of `http(s)://user:pass@server`
+ */
+  proxyPath?: string,
 }
 
 export interface RequestArguments<T = any> {

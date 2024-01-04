@@ -84,10 +84,6 @@ type FireblocksProviderConfig = {
    * If not provided, it is inferred from the chainId 
    */
   rpcUrl?: string,
-  /**
-   * Proxy path in the format of `http(s)://user:pass@server`
-   */
-  proxyPath?: string
 
   // ------------- Optional fields --------------
 
@@ -151,5 +147,9 @@ type FireblocksProviderConfig = {
    * Same as setting env var `DEBUG=fireblocks-web3-provider:error`
    */
   enhancedErrorHandling?: boolean,
+  /**
+   * Proxy path in the format of `http(s)://user:pass@server`
+   */
+  proxyPath?: string
 }
 ```
