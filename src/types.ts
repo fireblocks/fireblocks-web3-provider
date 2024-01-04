@@ -1,4 +1,5 @@
 import { FeeLevel } from "fireblocks-sdk";
+import { AxiosProxyConfig } from "axios";
 
 export enum ChainId {
   MAINNET = 1,
@@ -142,6 +143,11 @@ export type FireblocksProviderConfig = {
    * relayed via the provided vault account
    */
   gaslessGasTankVaultId?: number,
+
+/**
+ * Proxy path in the format of `http(s)://user:pass@server`
+ */
+  proxyPath?: string,
 }
 
 export interface RequestArguments<T = any> {

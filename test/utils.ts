@@ -10,17 +10,24 @@ export function getFireblocksProviderForTesting(extraConfiguration?: any) {
     throw new Error("Environment variables FIREBLOCKS_API_PRIVATE_KEY_PATH, FIREBLOCKS_API_KEY, FIREBLOCKS_VAULT_ACCOUNT_IDS must be set")
   }
 
-  const provider = new FireblocksWeb3Provider(
-    {
-      privateKey: process.env.FIREBLOCKS_API_PRIVATE_KEY_PATH,
-      apiKey: process.env.FIREBLOCKS_API_KEY,
-      vaultAccountIds: process.env.FIREBLOCKS_VAULT_ACCOUNT_IDS,
-      chainId: ChainId.GOERLI,
-      rpcUrl: process.env.FIREBLOCKS_RPC_URL,
-      apiBaseUrl: process.env.FIREBLOCKS_API_BASE_URL,
-      ...extraConfiguration
-    }
-  )
+  const providerConfig = {
+    privateKey: process.env.FIREBLOCKS_API_PRIVATE_KEY_PATH,
+    apiKey: process.env.FIREBLOCKS_API_KEY,
+    vaultAccountIds: process.env.FIREBLOCKS_VAULT_ACCOUNT_IDS,
+    chainId: ChainId.GOERLI,
+    rpcUrl: process.env.FIREBLOCKS_RPC_URL,
+    apiBaseUrl: process.env.FIREBLOCKS_API_BASE_URL,
+    ...extraConfiguration
+  };
+
+  if (process.env.PROXY_PATH) {
+    providerConfig["proxyPath"] = process.env.PROXY_PATH
+    if (process.env.PROXY_UNTRUSTED_CERT)
+      process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
+  }
+
+  const provider = new FireblocksWeb3Provider(providerConfig)
 
   return provider
 }
