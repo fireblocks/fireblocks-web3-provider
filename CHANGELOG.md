@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v1.3.0](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.2.6...v1.3.0)
+
+> 4 January 2024
+
+- feat: added proxy support [`#17`](https://github.com/fireblocks/fireblocks-web3-provider/pull/17)
+- release 1.2.6 [`c016644`](https://github.com/fireblocks/fireblocks-web3-provider/commit/c016644d6dcfcb01f6c88ab69ab63e14b4776718)
+
 #### [v1.2.6](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.2.5...v1.2.6)
 
 > 13 November 2023
