@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v1.3.1](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.3.0...v1.3.1)
+
+> 9 January 2024
+
+- Add chains [`#18`](https://github.com/fireblocks/fireblocks-web3-provider/pull/18)
+- release 1.3.0 [`6bb3486`](https://github.com/fireblocks/fireblocks-web3-provider/commit/6bb3486020e980dc5bff1fd6cf49b4a7cada199e)
+
 #### [v1.3.0](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.2.6...v1.3.0)
 
 > 4 January 2024
