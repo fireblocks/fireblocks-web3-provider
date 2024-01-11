@@ -1,4 +1,12 @@
-[![npm version](https://badge.fury.io/js/@fireblocks%2Ffireblocks-web3-provider.svg)](https://badge.fury.io/js/@fireblocks%2Ffireblocks-web3-provider)
+<p align="center">
+  <img src="./logo.svg" width="350" alt="accessibility text">
+</p>
+<div align="center">
+
+  [![npm version](https://badge.fury.io/js/@fireblocks%2Ffireblocks-web3-provider.svg)](https://badge.fury.io/js/@fireblocks%2Ffireblocks-web3-provider) </br>
+  [<ins>Fireblocks Web3 Provider Documentation</ins>](https://developers.fireblocks.com/docs/ethereum-development)
+</div>
+
 
 # Fireblocks Web3 Provider
 
