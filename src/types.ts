@@ -167,10 +167,16 @@ export type FireblocksProviderConfig = {
    */
   gaslessGasTankVaultId?: number,
 
-/**
- * Proxy path in the format of `http(s)://user:pass@server`
- */
+  /**
+   * Proxy path in the format of `http(s)://user:pass@server`
+   */
   proxyPath?: string,
+
+  /**
+   * Should the underlying Fireblocks SDK use the axios `proxyAgent` property (httpAgent / httpsAgent)
+   * Or use the axios `proxy` property
+   */
+  sdkUseProxyAgent?: boolean
 }
 
 export interface RequestArguments<T = any> {

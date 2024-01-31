@@ -82,6 +82,21 @@ export class FireblocksWeb3Provider extends HttpProvider {
 
     this.config = config
     this.headers = headers;
+    if (config.proxyPath) {
+      const proxyAgent = new HttpsProxyAgent(config.proxyPath);
+      this.agent = {
+        http: proxyAgent,
+        https: proxyAgent
+      }
+    }
+    let sdkProxyConfig: { httpsAgent: HttpsProxyAgent<string> | undefined, proxy: AxiosProxyConfig | undefined } = { httpsAgent: undefined, proxy: undefined };
+    if (config.proxyPath) {
+      if (config.sdkUseProxyAgent) {
+        sdkProxyConfig.httpsAgent = new HttpsProxyAgent(config.proxyPath);
+      } else {
+        sdkProxyConfig.proxy = this.toAxiosProxyConfig(config.proxyPath)
+      }
+    }
     this.fireblocksApiClient = new FireblocksSDK(
       this.parsePrivateKey(config.privateKey),
       config.apiKey,
@@ -89,7 +104,7 @@ export class FireblocksWeb3Provider extends HttpProvider {
       undefined,
       {
         userAgent: this.getUserAgent(),
-        proxy: config.proxyPath ? this.toAxiosProxyConfig(config.proxyPath) : undefined
+        ...sdkProxyConfig
       });
     this.feeLevel = config.fallbackFeeLevel || FeeLevel.MEDIUM
     this.note = config.note ?? 'Created by Fireblocks Web3 Provider'
@@ -100,15 +115,9 @@ export class FireblocksWeb3Provider extends HttpProvider {
     this.oneTimeAddressesEnabled = config.oneTimeAddressesEnabled ?? true
     this.chainId = config.chainId
     this.assetId = asset?.assetId
-  
-    if (config.proxyPath) {
-      const proxyAgent = new HttpsProxyAgent(config.proxyPath);
-      this.agent = {
-        http: proxyAgent,
-        https: proxyAgent
-      }
-    }
-  
+
+
+
     this.assetAndChainIdPopulatedPromise = promiseToFunction(async () => { if (!this.chainId) return await this.populateAssetAndChainId() })
     this.accountsPopulatedPromise = promiseToFunction(async () => { return await this.populateAccounts() })
     this.whitelistedPopulatedPromise = promiseToFunction(async () => { if (!this.oneTimeAddressesEnabled) return await this.populateWhitelisted() })

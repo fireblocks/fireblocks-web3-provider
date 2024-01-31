@@ -22,6 +22,9 @@ export function getFireblocksProviderForTesting(extraConfiguration?: any) {
 
   if (process.env.PROXY_PATH) {
     providerConfig["proxyPath"] = process.env.PROXY_PATH
+    if (process.env.USE_HTTPS_AGENT) {
+      providerConfig["sdkUseProxyAgent"] = true
+    }
     if (process.env.PROXY_UNTRUSTED_CERT)
       process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
