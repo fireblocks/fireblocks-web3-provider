@@ -100,11 +100,7 @@ export class FireblocksWeb3Provider extends HttpProvider {
     this.oneTimeAddressesEnabled = config.oneTimeAddressesEnabled ?? true
     this.chainId = config.chainId
     this.assetId = asset?.assetId
-    this.assetAndChainIdPopulatedPromise = promiseToFunction(async () => { if (!this.chainId) return await this.populateAssetAndChainId() })
-    this.accountsPopulatedPromise = promiseToFunction(async () => { return await this.populateAccounts() })
-    this.whitelistedPopulatedPromise = promiseToFunction(async () => { if (!this.oneTimeAddressesEnabled) return await this.populateWhitelisted() })
-    this.gaslessGasTankAddressPopulatedPromise = promiseToFunction(async () => { if (this.gaslessGasTankVaultId) return await this.populateGaslessGasTankAddress() })
-
+  
     if (config.proxyPath) {
       const proxyAgent = new HttpsProxyAgent(config.proxyPath);
       this.agent = {
@@ -112,6 +108,11 @@ export class FireblocksWeb3Provider extends HttpProvider {
         https: proxyAgent
       }
     }
+  
+    this.assetAndChainIdPopulatedPromise = promiseToFunction(async () => { if (!this.chainId) return await this.populateAssetAndChainId() })
+    this.accountsPopulatedPromise = promiseToFunction(async () => { return await this.populateAccounts() })
+    this.whitelistedPopulatedPromise = promiseToFunction(async () => { if (!this.oneTimeAddressesEnabled) return await this.populateWhitelisted() })
+    this.gaslessGasTankAddressPopulatedPromise = promiseToFunction(async () => { if (this.gaslessGasTankVaultId) return await this.populateGaslessGasTankAddress() })
   }
 
   private parsePrivateKey(privateKey: string): string {
