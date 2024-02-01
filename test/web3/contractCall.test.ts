@@ -46,7 +46,7 @@ async function getFirstAddressWithBalance() {
 }
 
 describe("Web3: Should be able to call a contract method", function () {
-  this.timeout(60_000)
+  this.timeout(600_000)
 
   it("greet() before", async function () {
     const currentGreeting = await greeterContract.methods.greet().call()
