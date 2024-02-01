@@ -82,20 +82,14 @@ export class FireblocksWeb3Provider extends HttpProvider {
 
     this.config = config
     this.headers = headers;
+    let sdkProxyConfig: { httpsAgent: HttpsProxyAgent<string> | undefined } = { httpsAgent: undefined };
     if (config.proxyPath) {
       const proxyAgent = new HttpsProxyAgent(config.proxyPath);
       this.agent = {
         http: proxyAgent,
         https: proxyAgent
       }
-    }
-    let sdkProxyConfig: { httpsAgent: HttpsProxyAgent<string> | undefined, proxy: AxiosProxyConfig | undefined } = { httpsAgent: undefined, proxy: undefined };
-    if (config.proxyPath) {
-      if (config.sdkUseProxyAgent) {
-        sdkProxyConfig.httpsAgent = new HttpsProxyAgent(config.proxyPath);
-      } else {
-        sdkProxyConfig.proxy = this.toAxiosProxyConfig(config.proxyPath)
-      }
+      sdkProxyConfig.httpsAgent = proxyAgent;
     }
     this.fireblocksApiClient = new FireblocksSDK(
       this.parsePrivateKey(config.privateKey),
