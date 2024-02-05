@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v1.3.3](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.3.2...v1.3.3)
+
+> 5 February 2024
+
+- change getDepositAddresses to getPaginatedAddresses [`#20`](https://github.com/fireblocks/fireblocks-web3-provider/pull/20)
+- release 1.3.2 [`8277431`](https://github.com/fireblocks/fireblocks-web3-provider/commit/8277431cfb86fa4008a09a71309fd528e0e19f95)
+
 #### [v1.3.2](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.3.1...v1.3.2)
 
 > 1 February 2024
