@@ -167,9 +167,10 @@ export type FireblocksProviderConfig = {
    */
   gaslessGasTankVaultId?: number,
 
-/**
- * Proxy path in the format of `http(s)://user:pass@server`
- */
+  /**
+   * Proxy path in the format of `http(s)://user:pass@server`.
+   * Note that all connections performed via the proxy will be done using CONNECT HTTP method.
+   */
   proxyPath?: string,
 }
 

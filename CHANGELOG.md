@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v1.3.2](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.3.1...v1.3.2)
+
+> 1 February 2024
+
+- Add logo file and update README [`#19`](https://github.com/fireblocks/fireblocks-web3-provider/pull/19)
+- Use httpsAgent instead of axiosconfig.proxy configuration for fireblocks-sdk [`55c5967`](https://github.com/fireblocks/fireblocks-web3-provider/commit/55c596700ffbf6650eae25b0df0053842e61685a)
+- release 1.3.1 [`eb8d896`](https://github.com/fireblocks/fireblocks-web3-provider/commit/eb8d896e3626743848bff3cbc6449f3e30bea0f1)
+
 #### [v1.3.1](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.3.0...v1.3.1)
 
 > 9 January 2024
