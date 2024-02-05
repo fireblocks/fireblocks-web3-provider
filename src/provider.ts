@@ -130,11 +130,11 @@ export class FireblocksWeb3Provider extends HttpProvider {
 
   private async populateGaslessGasTankAddress(): Promise<void> {
     await this.assetAndChainIdPopulatedPromise()
-    const depositAddresses = await this.fireblocksApiClient.getDepositAddresses(this.gaslessGasTankVaultId!.toString(), this.assetId!)
-    if (depositAddresses.length === 0) {
+    const depositAddresses = await this.fireblocksApiClient.getPaginatedAddresses(this.gaslessGasTankVaultId!.toString(), this.assetId!)
+    if (depositAddresses.addresses.length === 0) {
       throw Error(`Gasless gas tank vault not found (vault id: ${this.gaslessGasTankVaultId})`)
     }
-    this.gaslessGasTankVaultAddress = depositAddresses[0].address
+    this.gaslessGasTankVaultAddress = depositAddresses.addresses[0].address
     this.accounts[this.gaslessGasTankVaultId!] = this.gaslessGasTankVaultAddress
   }
 
@@ -200,17 +200,17 @@ export class FireblocksWeb3Provider extends HttpProvider {
     for (const vaultAccountId of this.vaultAccountIds) {
       let depositAddresses
       try {
-        depositAddresses = await this.fireblocksApiClient.getDepositAddresses(vaultAccountId.toString(), this.assetId!);
+        depositAddresses = await this.fireblocksApiClient.getPaginatedAddresses(vaultAccountId.toString(), this.assetId!);
       } catch (error) {
         throw this.createFireblocksError(error)
       }
 
-      if (this.config.vaultAccountIds && depositAddresses.length == 0) {
+      if (this.config.vaultAccountIds && depositAddresses.addresses.length == 0) {
         throw this.createError({ message: `No ${this.assetId} asset wallet found for vault account with id ${vaultAccountId}` })
       }
 
-      if (depositAddresses.length) {
-        this.accounts[vaultAccountId] = depositAddresses[0].address;
+      if (depositAddresses.addresses.length) {
+        this.accounts[vaultAccountId] = depositAddresses.addresses[0].address;
       }
     }
   }
