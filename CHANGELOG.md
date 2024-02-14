@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v1.3.4](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.3.3...v1.3.4)
+
+> 14 February 2024
+
+- release 1.3.3 [`407c260`](https://github.com/fireblocks/fireblocks-web3-provider/commit/407c2608c59c7b9ceee39e65abc375b123443150)
+- Add L2 Sepolia testnets (Optimism, Arbitrum, Base) [`0a3b178`](https://github.com/fireblocks/fireblocks-web3-provider/commit/0a3b17877854f64508c6a85fa8b788eb4fd25ebd)
+
 #### [v1.3.3](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.3.2...v1.3.3)
 
 > 5 February 2024
