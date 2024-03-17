@@ -380,7 +380,7 @@ export class FireblocksWeb3Provider extends HttpProvider {
     })));
 
     if (!searchParams.get('gasPrice') && tx.maxFeePerGas) {
-      searchParams.set('gasPrice', tx.maxFeePerGas)
+      searchParams.set('gasPrice', String(Number(tx.maxFeePerGas)))
     }
 
     return `https://dashboard.tenderly.co/simulator/new?${searchParams.toString()}`
