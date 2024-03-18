@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v1.3.5](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.3.4...v1.3.5)
+
+> 18 March 2024
+
+- Fix tenderly simulation URL params [`#22`](https://github.com/fireblocks/fireblocks-web3-provider/pull/22)
+- release 1.3.4 [`398c04f`](https://github.com/fireblocks/fireblocks-web3-provider/commit/398c04fbf85317d8c40efa1882e11b30dd7ad498)
+
 #### [v1.3.4](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.3.3...v1.3.4)
 
 > 14 February 2024
