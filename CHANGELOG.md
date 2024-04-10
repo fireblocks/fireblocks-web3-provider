@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v1.3.6](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.3.5...v1.3.6)
+
+> 10 April 2024
+
+- Add Polygon Amoy [`#24`](https://github.com/fireblocks/fireblocks-web3-provider/pull/24)
+- release 1.3.5 [`56f0a8f`](https://github.com/fireblocks/fireblocks-web3-provider/commit/56f0a8fb446b0acec3b8ec28b51541208fb7e3f6)
+
 #### [v1.3.5](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.3.4...v1.3.5)
 
 > 18 March 2024
