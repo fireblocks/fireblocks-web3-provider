@@ -13,6 +13,7 @@ export const ASSETS: { [key: string]: Asset } = {
   [ChainId.BSC_TEST]: { assetId: 'BNB_TEST', rpcUrl: "https://data-seed-prebsc-1-s1.binance.org:8545" },
   [ChainId.POLYGON]: { assetId: 'MATIC_POLYGON', rpcUrl: "https://polygon-rpc.com" },
   [ChainId.POLYGON_TEST]: { assetId: 'MATIC_POLYGON_MUMBAI', rpcUrl: "https://rpc-mumbai.maticvigil.com" },
+  [ChainId.POLYGON_AMOY]: { assetId: 'AMOY_POLYGON_TEST', rpcUrl: "https://rpc-amoy.polygon.technology" },
   [ChainId.AVALANCHE]: { assetId: 'AVAX', rpcUrl: "https://api.avax.network/ext/bc/C/rpc" },
   [ChainId.AVALANCHE_TEST]: { assetId: 'AVAXTEST', rpcUrl: "https://api.avax-test.network/ext/bc/C/rpc" },
   [ChainId.MOONRIVER]: { assetId: 'MOVR_MOVR', rpcUrl: "https://rpc.moonriver.moonbeam.network" },

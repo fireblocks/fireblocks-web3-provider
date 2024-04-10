@@ -13,6 +13,7 @@ export enum ChainId {
   BSC_TEST = 97,
   POLYGON = 137,
   POLYGON_TEST = 80001,
+  POLYGON_AMOY = 80002,
   AVALANCHE = 43114,
   AVALANCHE_TEST = 43113,
   MOONRIVER = 1285, // Moonbeam testnet
