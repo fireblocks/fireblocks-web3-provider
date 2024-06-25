@@ -454,7 +454,7 @@ Available addresses: ${Object.values(this.accounts).join(', ')}.`
 
   private async createGaslessTransaction(transaction: any) {
     await this.initialized()
-    if (transaction.chainId && transaction.chainId != this.chainId) {
+    if (transaction.chainId && Number(transaction.chainId) != Number(this.chainId)) {
       throw new Error(`Chain ID of the transaction (${transaction.chainId}) does not match the chain ID of the FireblocksWeb3Provider (${this.chainId})`);
     }
 
@@ -505,7 +505,7 @@ Available addresses: ${Object.values(this.accounts).join(', ')}.`
 
   private async createContractCall(transaction: any) {
     await this.initialized()
-    if (transaction.chainId && transaction.chainId != this.chainId) {
+    if (transaction.chainId && Number(transaction.chainId) != Number(this.chainId)) {
       throw this.createError({ message: `Chain ID of the transaction (${transaction.chainId}) does not match the chain ID of the FireblocksWeb3Provider (${this.chainId})` })
     }
 
