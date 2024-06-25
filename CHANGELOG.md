@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v1.3.7](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.3.6...v1.3.7)
+
+> 25 June 2024
+
+- fix chainId hex issue [`#26`](https://github.com/fireblocks/fireblocks-web3-provider/pull/26)
+- release 1.3.6 [`3e9bfae`](https://github.com/fireblocks/fireblocks-web3-provider/commit/3e9bfae90e7ed426c985639b8c23247f010deb81)
+
 #### [v1.3.6](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.3.5...v1.3.6)
 
 > 10 April 2024
