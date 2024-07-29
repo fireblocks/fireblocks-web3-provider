@@ -61,6 +61,8 @@ export enum ChainId {
 export enum ApiBaseUrl {
   Production = "https://api.fireblocks.io",
   Sandbox = "https://sandbox-api.fireblocks.io",
+  EU = "https://eu-api.fireblocks.io/v1",
+  EU2 = "https://eu2-api.fireblocks.io/v1",
 }
 
 export type Asset = {
