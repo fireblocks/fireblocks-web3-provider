@@ -56,6 +56,8 @@ export const ASSETS: { [key: string]: Asset } = {
   [ChainId.LINEA]: { assetId: 'LINEA', rpcUrl: "https://rpc.linea.build" },
   [ChainId.LINEA_TEST]: { assetId: 'LINEA_TEST', rpcUrl: "https://rpc.goerli.linea.build" },
   [ChainId.FLARE]: { assetId: 'FLR', rpcUrl: "https://flare-api.flare.network/ext/C/rpc" },
+  [ChainId.MANTLE]: { assetId: 'MANTLE', rpcUrl: "https://rpc.mantle.xyz" },
+  [ChainId.MANTLE_TEST]: { assetId: 'MANTLE_TEST', rpcUrl: "https://rpc.testnet.mantle.xyz" },
 }
 
 export const SIGNER_METHODS = [

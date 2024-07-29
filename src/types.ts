@@ -56,6 +56,8 @@ export enum ChainId {
   LINEA = 59144,
   LINEA_TEST = 59140,
   FLARE = 14,
+  MANTLE = 5000,
+  MANTLE_TEST = 5001,
 }
 
 export enum ApiBaseUrl {
