@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v1.3.8](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.3.7...v1.3.8)
+
+> 29 July 2024
+
+- release 1.3.7 [`c0ee722`](https://github.com/fireblocks/fireblocks-web3-provider/commit/c0ee722f103548b26ef1317bf00f660d962cc603)
+- Add MANTLE and MANTLE_TEST [`0ea1cb1`](https://github.com/fireblocks/fireblocks-web3-provider/commit/0ea1cb1c31fbcffac7e27b08e6d4f5b64721a8ac)
+- Add EU and EU2 base urls [`924e1e5`](https://github.com/fireblocks/fireblocks-web3-provider/commit/924e1e5a8241fc4ee3cbf8bafd5c3118d93144ba)
+
 #### [v1.3.7](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.3.6...v1.3.7)
 
 > 25 June 2024
