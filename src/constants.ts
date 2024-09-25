@@ -58,6 +58,8 @@ export const ASSETS: { [key: string]: Asset } = {
   [ChainId.FLARE]: { assetId: 'FLR', rpcUrl: "https://flare-api.flare.network/ext/C/rpc" },
   [ChainId.MANTLE]: { assetId: 'MANTLE', rpcUrl: "https://rpc.mantle.xyz" },
   [ChainId.MANTLE_TEST]: { assetId: 'MANTLE_TEST', rpcUrl: "https://rpc.testnet.mantle.xyz" },
+  [ChainId.BLAST]: { assetId: 'BLAST', rpcUrl: "https://rpc.ankr.com/blast"},
+  // [ChainId.BLAST_SEPOLIA]: { assetId: 'BLAST_TEST', rpcUrl: "https://sepolia.blast.io"},
 }
 
 export const SIGNER_METHODS = [
