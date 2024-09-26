@@ -58,6 +58,8 @@ export enum ChainId {
   FLARE = 14,
   MANTLE = 5000,
   MANTLE_TEST = 5001,
+  BLAST = 81457,
+  // BLAST_SEPOLIA = 168587773, 
 }
 
 export enum ApiBaseUrl {
