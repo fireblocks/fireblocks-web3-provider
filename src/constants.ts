@@ -60,6 +60,7 @@ export const ASSETS: { [key: string]: Asset } = {
   [ChainId.MANTLE_TEST]: { assetId: 'MANTLE_TEST', rpcUrl: "https://rpc.testnet.mantle.xyz" },
   [ChainId.BLAST]: { assetId: 'BLAST', rpcUrl: "https://rpc.ankr.com/blast"},
   // [ChainId.BLAST_SEPOLIA]: { assetId: 'BLAST_TEST', rpcUrl: "https://sepolia.blast.io"},
+  [ChainId.SONEIUM_MINATO]: { assetId: 'SONEIUM_MINATO_TEST', rpcUrl: "https://rpc.minato.soneium.org/" },
 }
 
 export const SIGNER_METHODS = [
