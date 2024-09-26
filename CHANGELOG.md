@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v1.3.9](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.3.8...v1.3.9)
+
+> 26 September 2024
+
+- add blast mainnet rpc_url and chainId to types and constants [`#30`](https://github.com/fireblocks/fireblocks-web3-provider/pull/30)
+- release 1.3.8 [`3dda98f`](https://github.com/fireblocks/fireblocks-web3-provider/commit/3dda98fa35cd78e111c2439aeaebb29ef76dda77)
+
 #### [v1.3.8](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.3.7...v1.3.8)
 
 > 29 July 2024
