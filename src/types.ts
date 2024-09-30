@@ -60,6 +60,7 @@ export enum ChainId {
   MANTLE_TEST = 5001,
   BLAST = 81457,
   // BLAST_SEPOLIA = 168587773, 
+  SONEIUM_MINATO = 1946
 }
 
 export enum ApiBaseUrl {
