@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v1.3.10](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.3.9...v1.3.10)
+
+> 30 September 2024
+
+- add support Sepolia Minato [`#31`](https://github.com/fireblocks/fireblocks-web3-provider/pull/31)
+- release 1.3.9 [`b791c9a`](https://github.com/fireblocks/fireblocks-web3-provider/commit/b791c9a0a27e8fa0b21b19b007171c912c328c21)
+
 #### [v1.3.9](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.3.8...v1.3.9)
 
 > 26 September 2024
