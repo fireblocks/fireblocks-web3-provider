@@ -61,6 +61,7 @@ export const ASSETS: { [key: string]: Asset } = {
   [ChainId.BLAST]: { assetId: 'BLAST', rpcUrl: "https://rpc.ankr.com/blast"},
   // [ChainId.BLAST_SEPOLIA]: { assetId: 'BLAST_TEST', rpcUrl: "https://sepolia.blast.io"},
   [ChainId.SONEIUM_MINATO]: { assetId: 'SONEIUM_MINATO_TEST', rpcUrl: "https://rpc.minato.soneium.org/" },
+  [ChainId.LACHAIN]: { assetId: 'LAC', rpcUrl: "https://rpc1.mainnet.lachain.network" },
 }
 
 export const SIGNER_METHODS = [
