@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v1.3.11](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.3.10...v1.3.11)
+
+> 29 October 2024
+
+- npm audit fix [`9b51249`](https://github.com/fireblocks/fireblocks-web3-provider/commit/9b51249d14c39ee6e18e23c0ed4ea325b0c828e2)
+- Change tests to run on Holesky [`b7bb11b`](https://github.com/fireblocks/fireblocks-web3-provider/commit/b7bb11be085ddcf706512fdfdcb4ca85e4758cb7)
+- release 1.3.10 [`308140d`](https://github.com/fireblocks/fireblocks-web3-provider/commit/308140d3e2aeda2e75d1f6835528fbdf31db0d58)
+
 #### [v1.3.10](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.3.9...v1.3.10)
 
 > 30 September 2024
