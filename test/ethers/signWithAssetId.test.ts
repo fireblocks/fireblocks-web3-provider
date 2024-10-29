@@ -3,8 +3,8 @@ import * as ethers from "ethers"
 import { getEthersFireblocksProviderForTesting } from "../utils"
 
 const provider = getEthersFireblocksProviderForTesting({
-  assetId: "ETH_TEST3",
-  rpcUrl: "https://rpc.ankr.com/eth_goerli",
+  assetId: "ETH_TEST6",
+  rpcUrl: "https://ethereum-holesky-rpc.publicnode.com",
   chainId: undefined,
 })
 

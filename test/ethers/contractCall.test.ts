@@ -4,7 +4,7 @@ import { getEthersFireblocksProviderForTesting } from "../utils"
 
 const minAmount = ethers.utils.parseEther("0.01")
 const provider = getEthersFireblocksProviderForTesting()
-const GREETER_ADDRESS = "0x8A470A36a1BDE8B18949599a061892f6B2c4fFAb"
+const GREETER_ADDRESS = "0x432d810484add7454ddb3b5311f0ac2e95cecea8"
 const GREETER_ABI = [
   {
     "type": "function",

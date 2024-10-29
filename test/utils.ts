@@ -14,7 +14,7 @@ export function getFireblocksProviderForTesting(extraConfiguration?: any) {
     privateKey: process.env.FIREBLOCKS_API_PRIVATE_KEY_PATH,
     apiKey: process.env.FIREBLOCKS_API_KEY,
     vaultAccountIds: process.env.FIREBLOCKS_VAULT_ACCOUNT_IDS,
-    chainId: ChainId.GOERLI,
+    chainId: ChainId.HOLESKY,
     rpcUrl: process.env.FIREBLOCKS_RPC_URL,
     apiBaseUrl: process.env.FIREBLOCKS_API_BASE_URL,
     ...extraConfiguration

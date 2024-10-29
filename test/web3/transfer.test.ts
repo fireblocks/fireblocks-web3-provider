@@ -36,6 +36,7 @@ describe("Web3: Should be able to transfer ETH", function () {
       from: fromAddress,
       to: toAddress,
       value: transferAmount,
+      gas: 21000,
     })
 
     const toAddressEndingBalance = await web3.eth.getBalance(toAddress)
