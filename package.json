@@ -59,7 +59,7 @@
     "debug": "^4.3.4",
     "ethers": "^5.7.2",
     "fireblocks-sdk": "^5.18.0",
-    "https-proxy-agent": "^7.0.2",
+    "https-proxy-agent": "^7.0.5",
     "web3-providers-http": "1.8.0"
   }
 }
