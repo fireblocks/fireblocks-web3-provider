@@ -57,7 +57,7 @@
     "@ethersproject/units": "^5.7.0",
     "axios": "^1.6.2",
     "debug": "^4.3.4",
-    "ethers": "^5.7.2",
+    "ethers": "^6.13.4",
     "fireblocks-sdk": "^5.18.0",
     "https-proxy-agent": "^7.0.2",
     "web3-providers-http": "1.8.0"
