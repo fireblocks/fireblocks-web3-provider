@@ -6,7 +6,7 @@ import { ApiBaseUrl, ChainId, FireblocksProviderConfig, ProviderRpcError, RawMes
 import { PeerType, TransactionOperation } from "fireblocks-sdk";
 import { formatEther, formatUnits, parseEther } from "@ethersproject/units";
 import { DEBUG_NAMESPACE_ENHANCED_ERROR_HANDLING, DEBUG_NAMESPACE_REQUESTS_AND_RESPONSES, DEBUG_NAMESPACE_TX_STATUS_CHANGES, FINAL_SUCCESSFUL_TRANSACTION_STATES, FINAL_TRANSACTION_STATES } from "./constants";
-import * as ethers from "ethers";
+import * as ethers from "ethers"
 import { NativeMetaTransaction__factory } from "./contracts/factories"
 import { _TypedDataEncoder } from "@ethersproject/hash";
 import { HttpsProxyAgent } from 'https-proxy-agent';
@@ -464,8 +464,8 @@ Available addresses: ${Object.values(this.accounts).join(', ')}.`
 
     const { data, from, to } = transaction
 
-    const ethersProvider = new ethers.providers.Web3Provider(this)
-    const NativeMetaTransactionContract = NativeMetaTransaction__factory.connect(to, ethersProvider.getSigner(this.gaslessGasTankVaultAddress))
+    const ethersProvider = new ethers.BrowserProvider(this)
+    const NativeMetaTransactionContract = NativeMetaTransaction__factory.connect(to, await ethersProvider.getSigner(this.gaslessGasTankVaultAddress))
 
     const nonce = Number(await NativeMetaTransactionContract.getNonce(from))
     const name = await NativeMetaTransactionContract.name()
@@ -492,7 +492,7 @@ Available addresses: ${Object.values(this.accounts).join(', ')}.`
         { name: 'functionSignature', type: 'bytes' },
       ],
     }
-    const signature = ethers.utils.splitSignature(await ethersProvider.getSigner(from)._signTypedData(
+    const signature = ethers.Signature.from(await (await ethersProvider.getSigner(from)).signTypedData(
       domain,
       types,
       req

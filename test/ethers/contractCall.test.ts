@@ -2,7 +2,7 @@ import { expect } from "chai"
 import * as ethers from "ethers"
 import { getEthersFireblocksProviderForTesting } from "../utils"
 
-const minAmount = ethers.utils.parseEther("0.01")
+const minAmount = ethers.parseEther("0.01")
 const provider = getEthersFireblocksProviderForTesting()
 const GREETER_ADDRESS = "0x432d810484add7454ddb3b5311f0ac2e95cecea8"
 const GREETER_ABI = [
@@ -36,12 +36,12 @@ const GREETER_ABI = [
 const greeting = (new Date()).toISOString()
 let greeterContract = new ethers.Contract(GREETER_ADDRESS, GREETER_ABI, provider);
 
-async function getFirstAddressWithBalance() {
-  const addresses = await provider.listAccounts()
-  for (const address of addresses) {
-    const balance = await provider.getBalance(address)
-    if (balance.gt(minAmount)) {
-      return address.toLowerCase()
+async function getFirstSignerWithBalance() {
+  const signers = (await provider.listAccounts())
+  for (const signer of signers) {
+    const balance = await provider.getBalance(signer.address)
+    if (balance > minAmount) {
+      return signer
     }
   }
 
@@ -58,9 +58,9 @@ describe("Ethers: Should be able to call a contract method", function () {
   })
 
   it("setGreeting(greeting)", async function () {
-    const addresses = await provider.listAccounts()
-    const firstAddressWithBalance = await getFirstAddressWithBalance()
-    const tx = await greeterContract.connect(provider.getSigner(firstAddressWithBalance)).setGreeting(greeting)
+    const firstSignerWithBalance = await getFirstSignerWithBalance()
+    greeterContract = new ethers.Contract(GREETER_ADDRESS, GREETER_ABI, firstSignerWithBalance);
+    const tx = await greeterContract.setGreeting(greeting)
 
     await tx.wait()
 

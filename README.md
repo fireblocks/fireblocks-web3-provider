@@ -34,14 +34,16 @@ const eip1193Provider = new FireblocksWeb3Provider({
 
 ## Usage with ethers.js
 ```sh
-npm install ethers@5
+npm install ethers
 ```
 
 ```js
 import * as ethers from "ethers"
 
-const provider = new ethers.providers.Web3Provider(eip1193Provider);
-// const provider = new ethers.BrowserProvider(eip1193Provider); // For ethers v6
+const provider = new ethers.BrowserProvider(eip1193Provider); 
+
+// Or like this if you're using ethers v5:
+// const provider = new ethers.providers.Web3Provider(eip1193Provider); 
 ```
 
 ## Usage with web3.js

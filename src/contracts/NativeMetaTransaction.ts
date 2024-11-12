@@ -3,41 +3,29 @@
 /* eslint-disable */
 import type {
   BaseContract,
-  BigNumber,
   BigNumberish,
   BytesLike,
-  CallOverrides,
-  ContractTransaction,
-  PayableOverrides,
-  PopulatedTransaction,
-  Signer,
-  utils,
-} from "ethers";
-import type {
   FunctionFragment,
   Result,
+  Interface,
   EventFragment,
-} from "@ethersproject/abi";
-import type { Listener, Provider } from "@ethersproject/providers";
+  AddressLike,
+  ContractRunner,
+  ContractMethod,
+  Listener,
+} from "ethers";
 import type {
-  TypedEventFilter,
-  TypedEvent,
+  TypedContractEvent,
+  TypedDeferredTopicFilter,
+  TypedEventLog,
+  TypedLogDescription,
   TypedListener,
-  OnEvent,
-  PromiseOrValue,
+  TypedContractMethod,
 } from "./common";
 
-export interface NativeMetaTransactionInterface extends utils.Interface {
-  functions: {
-    "ERC712_VERSION()": FunctionFragment;
-    "executeMetaTransaction(address,bytes,bytes32,bytes32,uint8)": FunctionFragment;
-    "getChainId()": FunctionFragment;
-    "getNonce(address)": FunctionFragment;
-    "name()": FunctionFragment;
-  };
-
+export interface NativeMetaTransactionInterface extends Interface {
   getFunction(
-    nameOrSignatureOrTopic:
+    nameOrSignature:
       | "ERC712_VERSION"
       | "executeMetaTransaction"
       | "getChainId"
@@ -45,19 +33,17 @@ export interface NativeMetaTransactionInterface extends utils.Interface {
       | "name"
   ): FunctionFragment;
 
+  getEvent(
+    nameOrSignatureOrTopic: "MetaTransactionExecuted" | "Unpaused"
+  ): EventFragment;
+
   encodeFunctionData(
     functionFragment: "ERC712_VERSION",
     values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "executeMetaTransaction",
-    values: [
-      PromiseOrValue<string>,
-      PromiseOrValue<BytesLike>,
-      PromiseOrValue<BytesLike>,
-      PromiseOrValue<BytesLike>,
-      PromiseOrValue<BigNumberish>
-    ]
+    values: [AddressLike, BytesLike, BytesLike, BytesLike, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "getChainId",
@@ -65,7 +51,7 @@ export interface NativeMetaTransactionInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "getNonce",
-    values: [PromiseOrValue<string>]
+    values: [AddressLike]
   ): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
 
@@ -80,183 +66,171 @@ export interface NativeMetaTransactionInterface extends utils.Interface {
   decodeFunctionResult(functionFragment: "getChainId", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "getNonce", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
-
-  events: {
-    "MetaTransactionExecuted(address,address,bytes)": EventFragment;
-    "Unpaused(address)": EventFragment;
-  };
-
-  getEvent(nameOrSignatureOrTopic: "MetaTransactionExecuted"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "Unpaused"): EventFragment;
 }
 
-export interface MetaTransactionExecutedEventObject {
-  userAddress: string;
-  relayerAddress: string;
-  functionSignature: string;
+export namespace MetaTransactionExecutedEvent {
+  export type InputTuple = [
+    userAddress: AddressLike,
+    relayerAddress: AddressLike,
+    functionSignature: BytesLike
+  ];
+  export type OutputTuple = [
+    userAddress: string,
+    relayerAddress: string,
+    functionSignature: string
+  ];
+  export interface OutputObject {
+    userAddress: string;
+    relayerAddress: string;
+    functionSignature: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type MetaTransactionExecutedEvent = TypedEvent<
-  [string, string, string],
-  MetaTransactionExecutedEventObject
->;
 
-export type MetaTransactionExecutedEventFilter =
-  TypedEventFilter<MetaTransactionExecutedEvent>;
-
-export interface UnpausedEventObject {
-  account: string;
+export namespace UnpausedEvent {
+  export type InputTuple = [account: AddressLike];
+  export type OutputTuple = [account: string];
+  export interface OutputObject {
+    account: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
-export type UnpausedEvent = TypedEvent<[string], UnpausedEventObject>;
-
-export type UnpausedEventFilter = TypedEventFilter<UnpausedEvent>;
 
 export interface NativeMetaTransaction extends BaseContract {
-  connect(signerOrProvider: Signer | Provider | string): this;
-  attach(addressOrName: string): this;
-  deployed(): Promise<this>;
+  connect(runner?: ContractRunner | null): NativeMetaTransaction;
+  waitForDeployment(): Promise<this>;
 
   interface: NativeMetaTransactionInterface;
 
-  queryFilter<TEvent extends TypedEvent>(
-    event: TypedEventFilter<TEvent>,
+  queryFilter<TCEvent extends TypedContractEvent>(
+    event: TCEvent,
     fromBlockOrBlockhash?: string | number | undefined,
     toBlock?: string | number | undefined
-  ): Promise<Array<TEvent>>;
+  ): Promise<Array<TypedEventLog<TCEvent>>>;
+  queryFilter<TCEvent extends TypedContractEvent>(
+    filter: TypedDeferredTopicFilter<TCEvent>,
+    fromBlockOrBlockhash?: string | number | undefined,
+    toBlock?: string | number | undefined
+  ): Promise<Array<TypedEventLog<TCEvent>>>;
 
-  listeners<TEvent extends TypedEvent>(
-    eventFilter?: TypedEventFilter<TEvent>
-  ): Array<TypedListener<TEvent>>;
-  listeners(eventName?: string): Array<Listener>;
-  removeAllListeners<TEvent extends TypedEvent>(
-    eventFilter: TypedEventFilter<TEvent>
-  ): this;
-  removeAllListeners(eventName?: string): this;
-  off: OnEvent<this>;
-  on: OnEvent<this>;
-  once: OnEvent<this>;
-  removeListener: OnEvent<this>;
+  on<TCEvent extends TypedContractEvent>(
+    event: TCEvent,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
+  on<TCEvent extends TypedContractEvent>(
+    filter: TypedDeferredTopicFilter<TCEvent>,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
 
-  functions: {
-    ERC712_VERSION(overrides?: CallOverrides): Promise<[string]>;
+  once<TCEvent extends TypedContractEvent>(
+    event: TCEvent,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
+  once<TCEvent extends TypedContractEvent>(
+    filter: TypedDeferredTopicFilter<TCEvent>,
+    listener: TypedListener<TCEvent>
+  ): Promise<this>;
 
-    executeMetaTransaction(
-      userAddress: PromiseOrValue<string>,
-      functionSignature: PromiseOrValue<BytesLike>,
-      sigR: PromiseOrValue<BytesLike>,
-      sigS: PromiseOrValue<BytesLike>,
-      sigV: PromiseOrValue<BigNumberish>,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+  listeners<TCEvent extends TypedContractEvent>(
+    event: TCEvent
+  ): Promise<Array<TypedListener<TCEvent>>>;
+  listeners(eventName?: string): Promise<Array<Listener>>;
+  removeAllListeners<TCEvent extends TypedContractEvent>(
+    event?: TCEvent
+  ): Promise<this>;
 
-    getChainId(overrides?: CallOverrides): Promise<[BigNumber]>;
+  ERC712_VERSION: TypedContractMethod<[], [string], "view">;
 
-    getNonce(
-      user: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber] & { nonce: BigNumber }>;
+  executeMetaTransaction: TypedContractMethod<
+    [
+      userAddress: AddressLike,
+      functionSignature: BytesLike,
+      sigR: BytesLike,
+      sigS: BytesLike,
+      sigV: BigNumberish
+    ],
+    [string],
+    "payable"
+  >;
 
-    name(overrides?: CallOverrides): Promise<[string]>;
-  };
+  getChainId: TypedContractMethod<[], [bigint], "view">;
 
-  ERC712_VERSION(overrides?: CallOverrides): Promise<string>;
+  getNonce: TypedContractMethod<[user: AddressLike], [bigint], "view">;
 
-  executeMetaTransaction(
-    userAddress: PromiseOrValue<string>,
-    functionSignature: PromiseOrValue<BytesLike>,
-    sigR: PromiseOrValue<BytesLike>,
-    sigS: PromiseOrValue<BytesLike>,
-    sigV: PromiseOrValue<BigNumberish>,
-    overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
+  name: TypedContractMethod<[], [string], "view">;
 
-  getChainId(overrides?: CallOverrides): Promise<BigNumber>;
+  getFunction<T extends ContractMethod = ContractMethod>(
+    key: string | FunctionFragment
+  ): T;
 
-  getNonce(
-    user: PromiseOrValue<string>,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
+  getFunction(
+    nameOrSignature: "ERC712_VERSION"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "executeMetaTransaction"
+  ): TypedContractMethod<
+    [
+      userAddress: AddressLike,
+      functionSignature: BytesLike,
+      sigR: BytesLike,
+      sigS: BytesLike,
+      sigV: BigNumberish
+    ],
+    [string],
+    "payable"
+  >;
+  getFunction(
+    nameOrSignature: "getChainId"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "getNonce"
+  ): TypedContractMethod<[user: AddressLike], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "name"
+  ): TypedContractMethod<[], [string], "view">;
 
-  name(overrides?: CallOverrides): Promise<string>;
-
-  callStatic: {
-    ERC712_VERSION(overrides?: CallOverrides): Promise<string>;
-
-    executeMetaTransaction(
-      userAddress: PromiseOrValue<string>,
-      functionSignature: PromiseOrValue<BytesLike>,
-      sigR: PromiseOrValue<BytesLike>,
-      sigS: PromiseOrValue<BytesLike>,
-      sigV: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<string>;
-
-    getChainId(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getNonce(
-      user: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    name(overrides?: CallOverrides): Promise<string>;
-  };
+  getEvent(
+    key: "MetaTransactionExecuted"
+  ): TypedContractEvent<
+    MetaTransactionExecutedEvent.InputTuple,
+    MetaTransactionExecutedEvent.OutputTuple,
+    MetaTransactionExecutedEvent.OutputObject
+  >;
+  getEvent(
+    key: "Unpaused"
+  ): TypedContractEvent<
+    UnpausedEvent.InputTuple,
+    UnpausedEvent.OutputTuple,
+    UnpausedEvent.OutputObject
+  >;
 
   filters: {
-    "MetaTransactionExecuted(address,address,bytes)"(
-      userAddress?: null,
-      relayerAddress?: null,
-      functionSignature?: null
-    ): MetaTransactionExecutedEventFilter;
-    MetaTransactionExecuted(
-      userAddress?: null,
-      relayerAddress?: null,
-      functionSignature?: null
-    ): MetaTransactionExecutedEventFilter;
+    "MetaTransactionExecuted(address,address,bytes)": TypedContractEvent<
+      MetaTransactionExecutedEvent.InputTuple,
+      MetaTransactionExecutedEvent.OutputTuple,
+      MetaTransactionExecutedEvent.OutputObject
+    >;
+    MetaTransactionExecuted: TypedContractEvent<
+      MetaTransactionExecutedEvent.InputTuple,
+      MetaTransactionExecutedEvent.OutputTuple,
+      MetaTransactionExecutedEvent.OutputObject
+    >;
 
-    "Unpaused(address)"(account?: null): UnpausedEventFilter;
-    Unpaused(account?: null): UnpausedEventFilter;
-  };
-
-  estimateGas: {
-    ERC712_VERSION(overrides?: CallOverrides): Promise<BigNumber>;
-
-    executeMetaTransaction(
-      userAddress: PromiseOrValue<string>,
-      functionSignature: PromiseOrValue<BytesLike>,
-      sigR: PromiseOrValue<BytesLike>,
-      sigS: PromiseOrValue<BytesLike>,
-      sigV: PromiseOrValue<BigNumberish>,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    getChainId(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getNonce(
-      user: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    name(overrides?: CallOverrides): Promise<BigNumber>;
-  };
-
-  populateTransaction: {
-    ERC712_VERSION(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    executeMetaTransaction(
-      userAddress: PromiseOrValue<string>,
-      functionSignature: PromiseOrValue<BytesLike>,
-      sigR: PromiseOrValue<BytesLike>,
-      sigS: PromiseOrValue<BytesLike>,
-      sigV: PromiseOrValue<BigNumberish>,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    getChainId(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    getNonce(
-      user: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    "Unpaused(address)": TypedContractEvent<
+      UnpausedEvent.InputTuple,
+      UnpausedEvent.OutputTuple,
+      UnpausedEvent.OutputObject
+    >;
+    Unpaused: TypedContractEvent<
+      UnpausedEvent.InputTuple,
+      UnpausedEvent.OutputTuple,
+      UnpausedEvent.OutputObject
+    >;
   };
 }

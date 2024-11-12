@@ -15,12 +15,12 @@ describe("Ethers: Should be able to sign using Fireblocks", function () {
     const signature = await signer.signMessage(message)
 
     const expectedSignerAddress = await signer.getAddress();
-    const recoveredAddress = ethers.utils.verifyMessage(message, signature);
+    const recoveredAddress = ethers.verifyMessage(message, signature);
 
     expect(recoveredAddress).to.be.equals(expectedSignerAddress)
   })
 
-  it("_signTypedData", async function () {
+  it("signTypedData", async function () {
     const signer = await provider.getSigner();
 
     const domain = {
@@ -61,14 +61,14 @@ describe("Ethers: Should be able to sign using Fireblocks", function () {
       deadline: 1
     }
 
-    const signature = await signer._signTypedData(
+    const signature = await signer.signTypedData(
       domain,
       types,
       message
     );
 
     const expectedSignerAddress = await signer.getAddress();
-    const recoveredAddress = ethers.utils.verifyTypedData(domain, types, message, signature);
+    const recoveredAddress = ethers.verifyTypedData(domain, types, message, signature);
 
     expect(recoveredAddress).to.be.equals(expectedSignerAddress)
   })

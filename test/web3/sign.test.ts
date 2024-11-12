@@ -14,7 +14,7 @@ describe("Web3: Should be able to sign using Fireblocks", function () {
 
     const signature = await web3.eth.personal.sign(message, signerAddress, "")
 
-    const recoveredAddress = ethers.utils.verifyMessage(message, signature)
+    const recoveredAddress = ethers.verifyMessage(message, signature)
 
     expect(recoveredAddress).to.be.equals(signerAddress)
   })
@@ -81,7 +81,7 @@ describe("Web3: Should be able to sign using Fireblocks", function () {
 
     // @ts-ignore
     delete types.EIP712Domain
-    const recoveredAddress = ethers.utils.verifyTypedData(domain, types, message, signature as any);
+    const recoveredAddress = ethers.verifyTypedData(domain, types, message, signature as any);
 
     expect(recoveredAddress).to.be.equals(signerAddress)
   })

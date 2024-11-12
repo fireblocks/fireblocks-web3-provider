@@ -2,8 +2,8 @@ import { expect } from "chai"
 import * as ethers from "ethers"
 import { getWeb3FireblocksProviderForTesting } from "../utils"
 
-const transferAmount = ethers.utils.parseEther("0.00000000001").toString()
-const minAmount = ethers.utils.parseEther("0.001").toString()
+const transferAmount = ethers.parseEther("0.00000000001").toString()
+const minAmount = ethers.parseEther("0.001").toString()
 const web3 = getWeb3FireblocksProviderForTesting()
 
 async function getFirstAddressWithBalance() {
