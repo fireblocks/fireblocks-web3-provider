@@ -8,7 +8,6 @@ import { formatEther, formatUnits, parseEther } from "@ethersproject/units";
 import { DEBUG_NAMESPACE_ENHANCED_ERROR_HANDLING, DEBUG_NAMESPACE_REQUESTS_AND_RESPONSES, DEBUG_NAMESPACE_TX_STATUS_CHANGES, FINAL_SUCCESSFUL_TRANSACTION_STATES, FINAL_TRANSACTION_STATES } from "./constants";
 import * as ethers from "ethers"
 import { NativeMetaTransaction__factory } from "./contracts/factories"
-import { _TypedDataEncoder } from "@ethersproject/hash";
 import { HttpsProxyAgent } from 'https-proxy-agent';
 import { formatJsonRpcRequest, formatJsonRpcResult } from "./jsonRpcUtils";
 import { version as SDK_VERSION } from "../package.json";
