@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v1.3.12](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.3.11...v1.3.12)
+
+> 12 November 2024
+
+- Update dependencies (including ethers to v6) [`#40`](https://github.com/fireblocks/fireblocks-web3-provider/pull/40)
+- release 1.3.11 [`c8f6618`](https://github.com/fireblocks/fireblocks-web3-provider/commit/c8f6618876953a65c5fd3d4ae199758717b79c70)
+
 #### [v1.3.11](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.3.10...v1.3.11)
 
 > 29 October 2024
