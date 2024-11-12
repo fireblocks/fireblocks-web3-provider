@@ -10,7 +10,7 @@ describe("Ethers: Should be able to read data from Ethereum", function () {
   it("getBalance", async function () {
     const nullAddressBalance = await provider.getBalance(NULL_ADDRESS)
 
-    expect(nullAddressBalance.gt(99999999999999))
+    expect(nullAddressBalance > 99999999999999)
   })
   it("getBlockNumber", async function () {
     const blockNumber = await provider.getBlockNumber()

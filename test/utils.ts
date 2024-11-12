@@ -33,7 +33,7 @@ export function getFireblocksProviderForTesting(extraConfiguration?: any) {
 }
 
 export function getEthersFireblocksProviderForTesting(extraConfiguration?: any) {
-  return new ethers.providers.Web3Provider(getFireblocksProviderForTesting(extraConfiguration))
+  return new ethers.BrowserProvider(getFireblocksProviderForTesting(extraConfiguration))
 }
 
 export function getWeb3FireblocksProviderForTesting(extraConfiguration?: any) {

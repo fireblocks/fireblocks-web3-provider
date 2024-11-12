@@ -8,7 +8,7 @@ if (process.env.FIREBLOCKS_GAS_TANK_VAULT_ID === undefined) {
 }
 
 const gaslessTokenAddress = "0x4533728af60e915108f244fb884945c14fd13cca"
-const mintAmount = ethers.utils.parseEther("10")
+const mintAmount = ethers.parseEther("10")
 const provider = getEthersFireblocksProviderForTesting({ gaslessGasTankVaultId: parseInt(process.env.FIREBLOCKS_GAS_TANK_VAULT_ID!) })
 
 describe("Gasless: should be able to send a transaction using a gasless relay server", function () {

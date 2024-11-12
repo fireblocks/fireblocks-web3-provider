@@ -18,7 +18,7 @@ describe("Ethers: Should be able to sign using Fireblocks (with assetId configur
     const signature = await signer.signMessage(message)
 
     const expectedSignerAddress = await signer.getAddress();
-    const recoveredAddress = ethers.utils.verifyMessage(message, signature);
+    const recoveredAddress = ethers.verifyMessage(message, signature);
 
     expect(recoveredAddress).to.be.equals(expectedSignerAddress)
   })
@@ -26,8 +26,8 @@ describe("Ethers: Should be able to sign using Fireblocks (with assetId configur
   it("getChainId", async function () {
     const signer = await provider.getSigner();
 
-    const chainId = await signer.getChainId()
+    const chainId = Number(await signer.provider.getNetwork().then(n => n.chainId))
 
-    expect(chainId).to.be.equals(5)
+    expect(chainId).to.be.equals(17000)
   })
 })
