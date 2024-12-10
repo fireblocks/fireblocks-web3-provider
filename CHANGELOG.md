@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v1.3.13](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.3.12...v1.3.13)
+
+> 10 December 2024
+
+- Add support to LaChain mainnet [`#32`](https://github.com/fireblocks/fireblocks-web3-provider/pull/32)
+- fix: package.json & package-lock.json to reduce vulnerabilities [`#41`](https://github.com/fireblocks/fireblocks-web3-provider/pull/41)
+- release 1.3.12 [`120d889`](https://github.com/fireblocks/fireblocks-web3-provider/commit/120d889af6d2d2b689c7b1918ed49c234485793c)
+
 #### [v1.3.12](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.3.11...v1.3.12)
 
 > 12 November 2024
