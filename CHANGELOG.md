@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v1.3.14](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.3.13...v1.3.14)
+
+> 10 December 2024
+
+- Update web3-utils [`#43`](https://github.com/fireblocks/fireblocks-web3-provider/pull/43)
+- release 1.3.13 [`9ebdfaa`](https://github.com/fireblocks/fireblocks-web3-provider/commit/9ebdfaa8d783f1761c71339694a427015a2b1b4f)
+
 #### [v1.3.13](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.3.12...v1.3.13)
 
 > 10 December 2024
