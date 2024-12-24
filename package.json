@@ -58,7 +58,7 @@
     "axios": "^1.7.8",
     "debug": "^4.3.7",
     "ethers": "^6.13.4",
-    "fireblocks-sdk": "^5.33.0",
+    "fireblocks-sdk": "^5.34.0",
     "https-proxy-agent": "^7.0.5",
     "web3-providers-http": "1.8.0"
   },
