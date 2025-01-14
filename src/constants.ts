@@ -60,6 +60,7 @@ export const ASSETS: { [key: string]: Asset } = {
   [ChainId.MANTLE_TEST]: { assetId: 'MANTLE_TEST', rpcUrl: "https://rpc.testnet.mantle.xyz" },
   [ChainId.BLAST]: { assetId: 'BLAST', rpcUrl: "https://rpc.ankr.com/blast"},
   // [ChainId.BLAST_SEPOLIA]: { assetId: 'BLAST_TEST', rpcUrl: "https://sepolia.blast.io"},
+  [ChainId.SONEIUM]: { assetId: 'ETH_SONEIUM', rpcUrl: "https://rpc.soneium.org/" },
   [ChainId.SONEIUM_MINATO]: { assetId: 'SONEIUM_MINATO_TEST', rpcUrl: "https://rpc.minato.soneium.org/" },
   [ChainId.LACHAIN]: { assetId: 'LAC', rpcUrl: "https://rpc1.mainnet.lachain.network" },
 }
