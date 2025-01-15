@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v1.3.15](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.3.14...v1.3.15)
+
+> 15 January 2025
+
+- Add Soneium [`#48`](https://github.com/fireblocks/fireblocks-web3-provider/pull/48)
+- release 1.3.14 [`493bd0b`](https://github.com/fireblocks/fireblocks-web3-provider/commit/493bd0b6b7e4fe50abae5c72f3579777c7f67efc)
+- Add Soneium to types.ts [`bdf3b00`](https://github.com/fireblocks/fireblocks-web3-provider/commit/bdf3b0031f6a8b793bd938f6e19902f9ca3dcab7)
+- Update CHANGELOG.md to fix chain name [`3bc3aea`](https://github.com/fireblocks/fireblocks-web3-provider/commit/3bc3aeaebac8fa186193d463cc24f5da72253d53)
+- Add Soneium to constants.ts [`aabbd5d`](https://github.com/fireblocks/fireblocks-web3-provider/commit/aabbd5d79a60e6c72ec84cec9c822e73107b23d8)
+
 #### [v1.3.14](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.3.13...v1.3.14)
 
 > 10 December 2024
@@ -36,7 +46,7 @@ All notable changes to this project will be documented in this file. Dates are d
 
 > 30 September 2024
 
-- Add Soneium Minato [`#31`](https://github.com/fireblocks/fireblocks-web3-provider/pull/31)
+- add support Sepolia Minato [`#31`](https://github.com/fireblocks/fireblocks-web3-provider/pull/31)
 - release 1.3.9 [`b791c9a`](https://github.com/fireblocks/fireblocks-web3-provider/commit/b791c9a0a27e8fa0b21b19b007171c912c328c21)
 
 #### [v1.3.9](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.3.8...v1.3.9)
