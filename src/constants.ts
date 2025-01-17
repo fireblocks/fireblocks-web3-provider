@@ -55,6 +55,7 @@ export const ASSETS: { [key: string]: Asset } = {
   [ChainId.SHIMMEREVM]: { assetId: 'SMR_SMR', rpcUrl: "https://json-rpc.evm.shimmer.network" },
   [ChainId.LINEA]: { assetId: 'LINEA', rpcUrl: "https://rpc.linea.build" },
   [ChainId.LINEA_TEST]: { assetId: 'LINEA_TEST', rpcUrl: "https://rpc.goerli.linea.build" },
+  [ChainId.LINEA_SEPOLIA_TEST]: { assetId: 'LINEA_SEPOLIA_TEST', rpcUrl: "https://rpc.sepolia.linea.build" },
   [ChainId.FLARE]: { assetId: 'FLR', rpcUrl: "https://flare-api.flare.network/ext/C/rpc" },
   [ChainId.MANTLE]: { assetId: 'MANTLE', rpcUrl: "https://rpc.mantle.xyz" },
   [ChainId.MANTLE_TEST]: { assetId: 'MANTLE_TEST', rpcUrl: "https://rpc.testnet.mantle.xyz" },
