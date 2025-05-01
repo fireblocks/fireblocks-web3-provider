@@ -75,9 +75,9 @@ export enum ApiBaseUrl {
 }
 
 export type Asset = {
-  assetId: string;
-  rpcUrl: string;
-};
+  assetId: string,
+  rpcUrl: string,
+}
 
 export enum RawMessageType {
   EIP712 = "EIP712",
@@ -86,108 +86,108 @@ export enum RawMessageType {
 
 export type FireblocksProviderConfig = {
   // ------------- Mandatory fields -------------
-  /**
-   * Learn more about creating API users here:
+  /** 
+   * Learn more about creating API users here: 
    * https://developers.fireblocks.com/docs/quickstart#api-user-creation
    */
 
-  /**
+  /** 
    * Fireblocks API key
    */
-  apiKey: string;
+  apiKey: string,
 
-  /**
+  /** 
    * Fireblocks API private key for signing requests
    */
-  privateKey: string;
+  privateKey: string,
 
   // Either chainId or rpcUrl must be provided
-  /**
-   * If not provided, it is inferred from the rpcUrl
+  /** 
+   * If not provided, it is inferred from the rpcUrl 
    */
-  chainId?: ChainId;
-  /**
-   * If not provided, it is inferred from the chainId
+  chainId?: ChainId,
+  /** 
+   * If not provided, it is inferred from the chainId 
    */
-  rpcUrl?: string;
+  rpcUrl?: string,
 
   // ------------- Optional fields --------------
 
-  /**
+  /** 
    * By default, the first 20 vault accounts are dynamically loaded from the Fireblocks API
    * It is recommended to provide the vault account ids explicitly because it helps avoid unnecessary API calls
    */
-  vaultAccountIds?: number | number[] | string | string[];
-  /**
+  vaultAccountIds?: number | number[] | string | string[],
+  /** 
    * By default, it uses the Fireblocks API production endpoint
    * When using a sandbox workspace, you should provide the ApiBaseUrl.Sandbox value
    */
-  apiBaseUrl?: ApiBaseUrl | string;
+  apiBaseUrl?: ApiBaseUrl | string,
   /**
    * By default, the fallback fee level is set to FeeLevel.MEDIUM
    */
-  fallbackFeeLevel?: FeeLevel;
+  fallbackFeeLevel?: FeeLevel,
   /**
    * By default, the note is set to "Created by Fireblocks Web3 Provider"
    */
-  note?: string;
+  note?: string,
   /**
    * By default, the polling interval is set to 1000ms (1 second)
    * It is the interval in which the Fireblocks API is queried to check the status of transactions
    */
-  pollingInterval?: number;
+  pollingInterval?: number,
   /**
    * By default, it is assumed that one time addresses are enabled in your workspace
    * If they're not, set this to false
    */
-  oneTimeAddressesEnabled?: boolean;
+  oneTimeAddressesEnabled?: boolean,
   /**
    * By default, no externalTxId is associated with transactions
    * If you want to set one, you can either provide a function that returns a string, or provide a string directly
    */
-  externalTxId?: (() => string) | string;
+  externalTxId?: (() => string) | string,
   /**
    * If you want to prepend an additional product string to the User-Agent header, you can provide it here
    */
-  userAgent?: string;
+  userAgent?: string,
   /**
    * If you are using a private/custom EVM chain, you can provide its Fireblocks assetId here
    */
-  assetId?: string;
+  assetId?: string,
   /**
    * Default: false
    * By setting to true, every transaction status change will be logged to the console
    * Same as setting env var `DEBUG=fireblocks-web3-provider:status`
    */
-  logTransactionStatusChanges?: boolean;
+  logTransactionStatusChanges?: boolean,
   /**
    * Default: false
    * By setting to true, every request and response processed by the provider will be logged to the console
    * Same as setting env var `DEBUG=fireblocks-web3-provider:req_res`
    */
-  logRequestsAndResponses?: boolean;
+  logRequestsAndResponses?: boolean,
   /**
    * Default: true
    * By setting to true, every failed transaction will print additional information
    * helpful for debugging, such as a link to simulate the transaction on Tenderly
    * Same as setting env var `DEBUG=fireblocks-web3-provider:error`
    */
-  enhancedErrorHandling?: boolean;
+  enhancedErrorHandling?: boolean,
   /**
    * Warning: This is an undocumented experimental flag that is subject to breaking changes
    * Warning: Use at your own risk
    * By default, no contracts are interacted with gaslessly
-   * By setting a gaslessGasTankVaultId, all transactions will be sent gaslessly,
+   * By setting a gaslessGasTankVaultId, all transactions will be sent gaslessly, 
    * relayed via the provided vault account
    */
-  gaslessGasTankVaultId?: number;
+  gaslessGasTankVaultId?: number,
 
   /**
    * Proxy path in the format of `http(s)://user:pass@server`.
    * Note that all connections performed via the proxy will be done using CONNECT HTTP method.
    */
-  proxyPath?: string;
-};
+  proxyPath?: string,
+}
 
 export interface RequestArguments<T = any> {
   method: string;
