@@ -63,6 +63,8 @@ export const ASSETS: { [key: string]: Asset } = {
   [ChainId.SONEIUM]: { assetId: 'ETH_SONEIUM', rpcUrl: "https://rpc.soneium.org/" },
   [ChainId.SONEIUM_MINATO]: { assetId: 'SONEIUM_MINATO_TEST', rpcUrl: "https://rpc.minato.soneium.org/" },
   [ChainId.LACHAIN]: { assetId: 'LAC', rpcUrl: "https://rpc1.mainnet.lachain.network" },
+  [ChainId.HYPER_EVM]: {assetId: 'HYPE_ETH', rpcUrl: "https://rpc.hyperliquid.xyz/evm" },
+  [ChainId.HYPER_EVM_TEST]: {assetId: 'HYPE_ETH_TEST', rpcUrl: "https://rpc.hyperliquid-testnet.xyz/evm" },
 }
 
 export const SIGNER_METHODS = [
