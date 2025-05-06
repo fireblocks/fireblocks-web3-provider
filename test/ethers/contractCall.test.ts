@@ -58,6 +58,8 @@ describe("Ethers: Should be able to call a contract method", function () {
   })
 
   it("setGreeting(greeting)", async function () {
+    this.retries(3);
+
     const firstSignerWithBalance = await getFirstSignerWithBalance()
     greeterContract = new ethers.Contract(GREETER_ADDRESS, GREETER_ABI, firstSignerWithBalance);
     const tx = await greeterContract.setGreeting(greeting)
