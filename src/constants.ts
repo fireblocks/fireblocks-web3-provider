@@ -65,6 +65,7 @@ export const ASSETS: { [key: string]: Asset } = {
   [ChainId.LACHAIN]: { assetId: 'LAC', rpcUrl: "https://rpc1.mainnet.lachain.network" },
   [ChainId.HYPER_EVM]: {assetId: 'HYPE_ETH', rpcUrl: "https://rpc.hyperliquid.xyz/evm" },
   [ChainId.HYPER_EVM_TEST]: {assetId: 'HYPE_ETH_TEST', rpcUrl: "https://rpc.hyperliquid-testnet.xyz/evm" },
+  [ChainId.ABSTRACT]: {assetId: 'ABSTRACT_ETH', rpcUrl: "https://api.mainnet.abs.xyz" },
 }
 
 export const SIGNER_METHODS = [

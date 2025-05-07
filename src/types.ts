@@ -65,6 +65,7 @@ export enum ChainId {
   LACHAIN = 274,
   HYPER_EVM = 999,
   HYPER_EVM_TEST = 998,
+  ABSTRACT = 2741,
 }
 
 export enum ApiBaseUrl {
