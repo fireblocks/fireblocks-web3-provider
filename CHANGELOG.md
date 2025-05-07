@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v1.3.16](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.3.15...v1.3.16)
+
+> 7 May 2025
+
+- Add HyperEVM and Abstract chains [`#56`](https://github.com/fireblocks/fireblocks-web3-provider/pull/56)
+- Update Github Actions to v4 [`#57`](https://github.com/fireblocks/fireblocks-web3-provider/pull/57)
+- release 1.3.15 [`6a7ea98`](https://github.com/fireblocks/fireblocks-web3-provider/commit/6a7ea98ba026d626f5c8ae1602cd489f4a5f70c1)
+
 #### [v1.3.15](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.3.14...v1.3.15)
 
 > 15 January 2025
