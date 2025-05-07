@@ -7,7 +7,7 @@ export const ASSETS: { [key: string]: Asset } = {
   [ChainId.KOVAN]: { assetId: 'ETH_TEST2', rpcUrl: "https://kovan.poa.network" },
   [ChainId.GOERLI]: { assetId: 'ETH_TEST3', rpcUrl: "https://rpc.ankr.com/eth_goerli" },
   [ChainId.RINKEBY]: { assetId: 'ETH_TEST4', rpcUrl: "https://rpc.ankr.com/eth_rinkeby" },
-  [ChainId.SEPOLIA]: { assetId: 'ETH_TEST5', rpcUrl: "https://rpc.sepolia.org" },
+  [ChainId.SEPOLIA]: { assetId: 'ETH_TEST5', rpcUrl: "https://ethereum-sepolia-rpc.publicnode.com" },
   [ChainId.HOLESKY]: { assetId: 'ETH_TEST6', rpcUrl: "https://ethereum-holesky-rpc.publicnode.com" },
   [ChainId.BSC]: { assetId: 'BNB_BSC', rpcUrl: "https://bsc-dataseed.binance.org" },
   [ChainId.BSC_TEST]: { assetId: 'BNB_TEST', rpcUrl: "https://data-seed-prebsc-1-s1.binance.org:8545" },
@@ -63,6 +63,9 @@ export const ASSETS: { [key: string]: Asset } = {
   [ChainId.SONEIUM]: { assetId: 'ETH_SONEIUM', rpcUrl: "https://rpc.soneium.org/" },
   [ChainId.SONEIUM_MINATO]: { assetId: 'SONEIUM_MINATO_TEST', rpcUrl: "https://rpc.minato.soneium.org/" },
   [ChainId.LACHAIN]: { assetId: 'LAC', rpcUrl: "https://rpc1.mainnet.lachain.network" },
+  [ChainId.HYPER_EVM]: {assetId: 'HYPE_ETH', rpcUrl: "https://rpc.hyperliquid.xyz/evm" },
+  [ChainId.HYPER_EVM_TEST]: {assetId: 'HYPE_ETH_TEST', rpcUrl: "https://rpc.hyperliquid-testnet.xyz/evm" },
+  [ChainId.ABSTRACT]: {assetId: 'ABSTRACT_ETH', rpcUrl: "https://api.mainnet.abs.xyz" },
 }
 
 export const SIGNER_METHODS = [

@@ -63,6 +63,9 @@ export enum ChainId {
   SONEIUM = 1868,
   SONEIUM_MINATO = 1946,
   LACHAIN = 274,
+  HYPER_EVM = 999,
+  HYPER_EVM_TEST = 998,
+  ABSTRACT = 2741,
 }
 
 export enum ApiBaseUrl {
