@@ -9,6 +9,7 @@ export const ASSETS: { [key: string]: Asset } = {
   [ChainId.RINKEBY]: { assetId: 'ETH_TEST4', rpcUrl: "https://rpc.ankr.com/eth_rinkeby" },
   [ChainId.SEPOLIA]: { assetId: 'ETH_TEST5', rpcUrl: "https://ethereum-sepolia-rpc.publicnode.com" },
   [ChainId.HOLESKY]: { assetId: 'ETH_TEST6', rpcUrl: "https://ethereum-holesky-rpc.publicnode.com" },
+  [ChainId.HOODI]: { assetId: 'ETH_TEST_HOODI', rpcUrl: "https://ethereum-hoodi-rpc.publicnode.com" },
   [ChainId.BSC]: { assetId: 'BNB_BSC', rpcUrl: "https://bsc-dataseed.binance.org" },
   [ChainId.BSC_TEST]: { assetId: 'BNB_TEST', rpcUrl: "https://data-seed-prebsc-1-s1.binance.org:8545" },
   [ChainId.POLYGON]: { assetId: 'MATIC_POLYGON', rpcUrl: "https://polygon-rpc.com" },
