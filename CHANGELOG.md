@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v1.3.17](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.3.16...v1.3.17)
+
+> 14 May 2025
+
+- Add Ethereum Hoodi and Linea Sepolia to chain chain and asset IDs [`#60`](https://github.com/fireblocks/fireblocks-web3-provider/pull/60)
+- release 1.3.16 [`72702c5`](https://github.com/fireblocks/fireblocks-web3-provider/commit/72702c520af471cfaa6ccde11d1d2bcd7a21c697)
+
 #### [v1.3.16](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.3.15...v1.3.16)
 
 > 7 May 2025
