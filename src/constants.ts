@@ -68,6 +68,12 @@ export const ASSETS: { [key: string]: Asset } = {
   [ChainId.HYPER_EVM]: {assetId: 'HYPE_ETH', rpcUrl: "https://rpc.hyperliquid.xyz/evm" },
   [ChainId.HYPER_EVM_TEST]: {assetId: 'HYPE_ETH_TEST', rpcUrl: "https://rpc.hyperliquid-testnet.xyz/evm" },
   [ChainId.ABSTRACT]: {assetId: 'ABSTRACT_ETH', rpcUrl: "https://api.mainnet.abs.xyz" },
+  [ChainId.UNICHAIN]: {assetId: 'UNICHAIN_ETH', rpcUrl: "https://mainnet.unichain.org" },
+  [ChainId.BERACHAIN]: {assetId: 'BERACHAIN', rpcUrl: "https://rpc.berachain.com" },
+  [ChainId.SONIC]: {assetId: 'SONIC', rpcUrl: "https://rpc.soniclabs.com" },
+  [ChainId.GNOSIS]: {assetId: 'XDAI', rpcUrl: "https://rpc.gnosischain.com" },
+  [ChainId.WORLDCHAIN]: {assetId: 'WORLDCHAIN', rpcUrl: "https://worldchain.drpc.org" },
+  
 }
 
 export const SIGNER_METHODS = [
