@@ -68,6 +68,11 @@ export enum ChainId {
   HYPER_EVM = 999,
   HYPER_EVM_TEST = 998,
   ABSTRACT = 2741,
+  UNICHAIN = 130,
+  BERACHAIN = 80094,
+  SONIC = 146,
+  GNOSIS = 100,
+  WORLDCHAIN = 480
 }
 
 export enum ApiBaseUrl {
