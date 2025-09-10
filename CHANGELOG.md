@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v1.3.18](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.3.17...v1.3.18)
+
+> 9 September 2025
+
+- release 1.3.17 [`b50f71e`](https://github.com/fireblocks/fireblocks-web3-provider/commit/b50f71efe4281ba5249cff77c552158962b2bb78)
+- feat: :sparkles: added several new chains [`6bb7e36`](https://github.com/fireblocks/fireblocks-web3-provider/commit/6bb7e362b3cfe81d8764479c44af92c343c3ab1e)
+
 #### [v1.3.17](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.3.16...v1.3.17)
 
 > 14 May 2025
