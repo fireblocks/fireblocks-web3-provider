@@ -72,7 +72,8 @@ export enum ChainId {
   BERACHAIN = 80094,
   SONIC = 146,
   GNOSIS = 100,
-  WORLDCHAIN = 480
+  WORLDCHAIN = 480,
+  ARC_TEST = 5042002
 }
 
 export enum ApiBaseUrl {
