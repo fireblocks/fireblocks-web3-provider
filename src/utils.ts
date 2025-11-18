@@ -1,5 +1,6 @@
 import { ASSETS } from "./constants";
-import { ChainId, Asset } from "./types";
+import { ADDRESS_FORMATTERS } from "./formatters";
+import { ChainId, Asset, FormatterMetadata } from "./types";
 
 export function getAssetByChain(chain: ChainId): Asset {
     return ASSETS[chain]
@@ -18,4 +19,16 @@ export function promiseToFunction(func: () => Promise<any>): () => Promise<void>
         if (exceptionThrown)
             throw result
     };
+}
+
+export function normalizeAddress(address: string, assetId?: string): string {
+    const metadata: FormatterMetadata = { assetId };
+    
+    for (const formatter of ADDRESS_FORMATTERS) {
+        if (formatter.predicate(address, metadata)) {
+            return formatter.format(address);
+        }
+    }
+    
+    return address;
 }

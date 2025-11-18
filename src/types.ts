@@ -72,7 +72,10 @@ export enum ChainId {
   BERACHAIN = 80094,
   SONIC = 146,
   GNOSIS = 100,
-  WORLDCHAIN = 480
+  WORLDCHAIN = 480,
+  BOB=60808,
+  BOB_SEPOLIA=808813,
+  PLUME=98866,
 }
 
 export enum ApiBaseUrl {
@@ -206,4 +209,13 @@ export interface ProviderRpcError extends Error {
   code: number;
   data?: unknown;
   payload: RequestArguments;
+}
+
+export interface FormatterMetadata {
+  assetId?: string;
+}
+
+export interface AddressFormatter {
+  predicate: (address: string, metadata: FormatterMetadata) => boolean;
+  format: (address: string) => string;
 }

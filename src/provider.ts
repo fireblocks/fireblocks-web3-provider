@@ -1,10 +1,10 @@
 import util from "util";
 import { DestinationTransferPeerPath, FeeLevel, FireblocksSDK, TransactionArguments, TransactionResponse, TransactionStatus } from "fireblocks-sdk";
-import { getAssetByChain, promiseToFunction } from "./utils";
+import { getAssetByChain, promiseToFunction, normalizeAddress } from "./utils";
 import { readFileSync } from "fs";
 import { ApiBaseUrl, ChainId, FireblocksProviderConfig, ProviderRpcError, RawMessageType, RequestArguments } from "./types";
 import { PeerType, TransactionOperation } from "fireblocks-sdk";
-import { formatEther, formatUnits, parseEther } from "@ethersproject/units";
+import { formatEther, formatUnits } from "@ethersproject/units";
 import { DEBUG_NAMESPACE_ENHANCED_ERROR_HANDLING, DEBUG_NAMESPACE_REQUESTS_AND_RESPONSES, DEBUG_NAMESPACE_TX_STATUS_CHANGES, FINAL_SUCCESSFUL_TRANSACTION_STATES, FINAL_TRANSACTION_STATES } from "./constants";
 import * as ethers from "ethers"
 import { NativeMetaTransaction__factory } from "./contracts/factories"
@@ -133,7 +133,7 @@ export class FireblocksWeb3Provider extends HttpProvider {
     if (depositAddresses.addresses.length === 0) {
       throw Error(`Gasless gas tank vault not found (vault id: ${this.gaslessGasTankVaultId})`)
     }
-    this.gaslessGasTankVaultAddress = depositAddresses.addresses[0].address
+    this.gaslessGasTankVaultAddress = normalizeAddress(depositAddresses.addresses[0].address, this.assetId)
     this.accounts[this.gaslessGasTankVaultId!] = this.gaslessGasTankVaultAddress
   }
 
@@ -209,7 +209,7 @@ export class FireblocksWeb3Provider extends HttpProvider {
       }
 
       if (depositAddresses.addresses.length) {
-        this.accounts[vaultAccountId] = depositAddresses.addresses[0].address;
+        this.accounts[vaultAccountId] = normalizeAddress(depositAddresses.addresses[0].address, this.assetId);
       }
     }
   }
