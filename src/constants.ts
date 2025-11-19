@@ -76,6 +76,7 @@ export const ASSETS: { [key: string]: Asset } = {
   [ChainId.BOB]: {assetId: 'BOB_CHAIN', rpcUrl: "https://bob.drpc.org" },
   [ChainId.BOB_SEPOLIA]: {assetId: 'BOB_CHAIN_TEST', rpcUrl: "https://bob-testnet.drpc.org" },
   [ChainId.PLUME]: {assetId: 'PLUME_PLUME', rpcUrl: "https://plume.drpc.org" },
+  [ChainId.SOPHON]: {assetId: 'SOPHON', rpcUrl: "https://rpc.sophon.xyz" },
 }
 
 export const SIGNER_METHODS = [
