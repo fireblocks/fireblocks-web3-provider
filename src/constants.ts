@@ -73,7 +73,7 @@ export const ASSETS: { [key: string]: Asset } = {
   [ChainId.SONIC]: {assetId: 'SONIC', rpcUrl: "https://rpc.soniclabs.com" },
   [ChainId.GNOSIS]: {assetId: 'XDAI', rpcUrl: "https://rpc.gnosischain.com" },
   [ChainId.WORLDCHAIN]: {assetId: 'WORLDCHAIN', rpcUrl: "https://worldchain.drpc.org" },
-  [ChainId.ARC_TEST]: {assetId: 'USDC', rpcUrl: "https://rpc.testnet.arc.network" },
+  [ChainId.ARC_TEST]: {assetId: 'ARC_TEST', rpcUrl: "https://rpc.testnet.arc.network" },
 }
 
 export const SIGNER_METHODS = [
