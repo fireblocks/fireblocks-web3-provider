@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { normalizeAddress } from "../../dist/src/utils";
+import { normalizeAddress } from "../../src/utils";
 
 describe("Address Normalization", function () {
   describe("XDC Address Formatting", function () {
