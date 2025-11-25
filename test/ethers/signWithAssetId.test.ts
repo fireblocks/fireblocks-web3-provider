@@ -3,8 +3,8 @@ import * as ethers from "ethers"
 import { getEthersFireblocksProviderForTesting } from "../utils"
 
 const provider = getEthersFireblocksProviderForTesting({
-  assetId: "ETH_TEST6",
-  rpcUrl: "https://ethereum-holesky-rpc.publicnode.com",
+  assetId: "ETH_TEST_HOODI",
+  rpcUrl: "https://ethereum-hoodi-rpc.publicnode.com",
   chainId: undefined,
 })
 
@@ -28,6 +28,6 @@ describe("Ethers: Should be able to sign using Fireblocks (with assetId configur
 
     const chainId = Number(await signer.provider.getNetwork().then(n => n.chainId))
 
-    expect(chainId).to.be.equals(17000)
+    expect(chainId).to.be.equals(560048)
   })
 })
