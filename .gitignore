@@ -71,3 +71,6 @@ example/coverage.json
 example/typechain
 example/cache
 example/artifacts
+
+# Keys
+*.key

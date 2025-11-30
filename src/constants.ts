@@ -73,6 +73,10 @@ export const ASSETS: { [key: string]: Asset } = {
   [ChainId.SONIC]: {assetId: 'SONIC', rpcUrl: "https://rpc.soniclabs.com" },
   [ChainId.GNOSIS]: {assetId: 'XDAI', rpcUrl: "https://rpc.gnosischain.com" },
   [ChainId.WORLDCHAIN]: {assetId: 'WORLDCHAIN', rpcUrl: "https://worldchain.drpc.org" },
+  [ChainId.BOB]: {assetId: 'BOB_CHAIN', rpcUrl: "https://bob.drpc.org" },
+  [ChainId.BOB_SEPOLIA]: {assetId: 'BOB_CHAIN_TEST', rpcUrl: "https://bob-testnet.drpc.org" },
+  [ChainId.PLUME]: {assetId: 'PLUME_PLUME', rpcUrl: "https://plume.drpc.org" },
+  [ChainId.SOPHON]: {assetId: 'SOPHON', rpcUrl: "https://rpc.sophon.xyz" },
   [ChainId.ARC_TEST]: {assetId: 'ARC_TEST', rpcUrl: "https://rpc.testnet.arc.network" },
 }
 

@@ -1,7 +1,7 @@
 import { expect } from "chai"
 import { getWeb3FireblocksProviderForTesting } from "../utils"
 
-const GREETER_ADDRESS = "0x432d810484add7454ddb3b5311f0ac2e95cecea8"
+const GREETER_ADDRESS = "0xE0601C64CCef58231D1dCb419D870FD294332E14"
 const GREETER_ABI = [
   {
     "type": "function",

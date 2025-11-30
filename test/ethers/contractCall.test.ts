@@ -4,7 +4,7 @@ import { getEthersFireblocksProviderForTesting } from "../utils"
 
 const minAmount = ethers.parseEther("0.01")
 const provider = getEthersFireblocksProviderForTesting()
-const GREETER_ADDRESS = "0x432d810484add7454ddb3b5311f0ac2e95cecea8"
+const GREETER_ADDRESS = "0xE0601C64CCef58231D1dCb419D870FD294332E14"
 const GREETER_ABI = [
   {
     "type": "function",
@@ -33,11 +33,11 @@ const GREETER_ABI = [
     "stateMutability": "nonpayable",
   }
 ]
-const greeting = (new Date()).toISOString()
+const greeting = new Date().toISOString()
 let greeterContract = new ethers.Contract(GREETER_ADDRESS, GREETER_ABI, provider);
 
 async function getFirstSignerWithBalance() {
-  const signers = (await provider.listAccounts())
+  const signers = await provider.listAccounts()
   for (const signer of signers) {
     const balance = await provider.getBalance(signer.address)
     if (balance > minAmount) {
@@ -66,7 +66,7 @@ describe("Ethers: Should be able to call a contract method", function () {
       await tx.wait()
 
       expect(tx.hash).to.be.not.undefined
-    } catch (err) {
+    } catch (err: unknown) {
       console.warn('[NON-FAIL] "setGreeting(greeting)" test failed but continuing:', err);
     }
   })
@@ -76,7 +76,7 @@ describe("Ethers: Should be able to call a contract method", function () {
       const currentGreeting = await greeterContract.greet()
 
       expect(currentGreeting).to.be.equal(greeting)
-    } catch (err) {
+    } catch (err: unknown) {
       console.warn('[NON-FAIL] "greet() after" test failed but continuing:', err);
     }
   })
