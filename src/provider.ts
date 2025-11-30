@@ -109,10 +109,34 @@ export class FireblocksWeb3Provider extends HttpProvider {
 
 
 
-    this.assetAndChainIdPopulatedPromise = promiseToFunction(async () => { if (!this.chainId) return await this.populateAssetAndChainId() })
-    this.accountsPopulatedPromise = promiseToFunction(async () => { return await this.populateAccounts() })
-    this.whitelistedPopulatedPromise = promiseToFunction(async () => { if (!this.oneTimeAddressesEnabled) return await this.populateWhitelisted() })
-    this.gaslessGasTankAddressPopulatedPromise = promiseToFunction(async () => { if (this.gaslessGasTankVaultId) return await this.populateGaslessGasTankAddress() })
+    this.assetAndChainIdPopulatedPromise = promiseToFunction(async () => {
+      try {
+        if (!this.chainId) return await this.populateAssetAndChainId()
+      } catch (error) {
+        throw this.createError({ message: `Failed to populate asset and chain ID: ${error instanceof Error ? error.message : String(error)}` })
+      }
+    })
+    this.accountsPopulatedPromise = promiseToFunction(async () => {
+      try {
+        return await this.populateAccounts()
+      } catch (error) {
+        throw this.createError({ message: `Failed to populate accounts: ${error instanceof Error ? error.message : String(error)}` })
+      }
+    })
+    this.whitelistedPopulatedPromise = promiseToFunction(async () => {
+      try {
+        if (!this.oneTimeAddressesEnabled) return await this.populateWhitelisted()
+      } catch (error) {
+        throw this.createError({ message: `Failed to populate whitelisted addresses: ${error instanceof Error ? error.message : String(error)}` })
+      }
+    })
+    this.gaslessGasTankAddressPopulatedPromise = promiseToFunction(async () => {
+      try {
+        if (this.gaslessGasTankVaultId) return await this.populateGaslessGasTankAddress()
+      } catch (error) {
+        throw this.createError({ message: `Failed to populate gasless gas tank address: ${error instanceof Error ? error.message : String(error)}` })
+      }
+    })
   }
 
   private parsePrivateKey(privateKey: string): string {
@@ -128,9 +152,13 @@ export class FireblocksWeb3Provider extends HttpProvider {
   }
 
   private async populateGaslessGasTankAddress(): Promise<void> {
-    await this.assetAndChainIdPopulatedPromise()
+    try {
+      await this.assetAndChainIdPopulatedPromise()
+    } catch (error) {
+      throw this.createError({ message: `Failed to populate asset and chain ID: ${error instanceof Error ? error.message : String(error)}` })
+    }
     const depositAddresses = await this.fireblocksApiClient.getPaginatedAddresses(this.gaslessGasTankVaultId!.toString(), this.assetId!)
-    if (depositAddresses.addresses.length === 0) {
+    if (!depositAddresses?.addresses || depositAddresses.addresses.length === 0) {
       throw Error(`Gasless gas tank vault not found (vault id: ${this.gaslessGasTankVaultId})`)
     }
     this.gaslessGasTankVaultAddress = normalizeAddress(depositAddresses.addresses[0].address, this.assetId)
@@ -158,7 +186,11 @@ export class FireblocksWeb3Provider extends HttpProvider {
   }
 
   private async getVaultAccounts(): Promise<number[]> {
-    await this.assetAndChainIdPopulatedPromise()
+    try {
+      await this.assetAndChainIdPopulatedPromise()
+    } catch (error) {
+      throw this.createError({ message: `Failed to populate asset and chain ID: ${error instanceof Error ? error.message : String(error)}` })
+    }
 
     return (await this.fireblocksApiClient.getVaultAccountsWithPageInfo(
       {
@@ -194,7 +226,11 @@ export class FireblocksWeb3Provider extends HttpProvider {
       this.vaultAccountIds = await this.getVaultAccounts()
     }
 
-    await this.assetAndChainIdPopulatedPromise()
+    try {
+      await this.assetAndChainIdPopulatedPromise()
+    } catch (error) {
+      throw this.createError({ message: `Failed to populate asset and chain ID: ${error instanceof Error ? error.message : String(error)}` })
+    }
 
     for (const vaultAccountId of this.vaultAccountIds) {
       let depositAddresses
@@ -204,11 +240,11 @@ export class FireblocksWeb3Provider extends HttpProvider {
         throw this.createFireblocksError(error)
       }
 
-      if (this.config.vaultAccountIds && depositAddresses.addresses.length == 0) {
+      if (this.config.vaultAccountIds && (!depositAddresses?.addresses || depositAddresses.addresses.length == 0)) {
         throw this.createError({ message: `No ${this.assetId} asset wallet found for vault account with id ${vaultAccountId}` })
       }
 
-      if (depositAddresses.addresses.length) {
+      if (depositAddresses?.addresses?.length) {
         this.accounts[vaultAccountId] = normalizeAddress(depositAddresses.addresses[0].address, this.assetId);
       }
     }
@@ -238,7 +274,11 @@ export class FireblocksWeb3Provider extends HttpProvider {
       throw this.createError({ message: "Whitelisted already populated" })
     }
 
-    await this.assetAndChainIdPopulatedPromise()
+    try {
+      await this.assetAndChainIdPopulatedPromise()
+    } catch (error) {
+      throw this.createError({ message: `Failed to populate asset and chain ID: ${error instanceof Error ? error.message : String(error)}` })
+    }
 
     const [externalWallets, internalWallets, contractWallets] = await Promise.all([
       this.getWhitelistedWallets(this.fireblocksApiClient.getExternalWallets(), PeerType.EXTERNAL_WALLET, this.assetId!),
@@ -246,7 +286,11 @@ export class FireblocksWeb3Provider extends HttpProvider {
       this.getWhitelistedWallets(this.fireblocksApiClient.getContractWallets(), PeerType.EXTERNAL_WALLET, this.assetId!),
     ])
 
-    await this.accountsPopulatedPromise()
+    try {
+      await this.accountsPopulatedPromise()
+    } catch (error) {
+      throw this.createError({ message: `Failed to populate accounts: ${error instanceof Error ? error.message : String(error)}` })
+    }
 
     const vaultWallets = Object.entries(this.accounts).map(([id, address]) => ({
       type: PeerType.VAULT_ACCOUNT,
@@ -262,14 +306,18 @@ export class FireblocksWeb3Provider extends HttpProvider {
   }
 
   private async initialized() {
-    await Promise.all(
-      [
-        this.assetAndChainIdPopulatedPromise(),
-        this.accountsPopulatedPromise(),
-        this.whitelistedPopulatedPromise(),
-        this.gaslessGasTankAddressPopulatedPromise(),
-      ]
-    )
+    try {
+      await Promise.all(
+        [
+          this.assetAndChainIdPopulatedPromise(),
+          this.accountsPopulatedPromise(),
+          this.whitelistedPopulatedPromise(),
+          this.gaslessGasTankAddressPopulatedPromise(),
+        ]
+      )
+    } catch (error) {
+      throw this.createError({ message: `Failed to initialize provider: ${error instanceof Error ? error.message : String(error)}` })
+    }
   }
 
   public send(
