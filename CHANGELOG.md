@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v1.3.19](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.3.18...v1.3.19)
+
+> 30 November 2025
+
+- feat: :sparkles: add new chains and normalize xdc address functionality [`#65`](https://github.com/fireblocks/fireblocks-web3-provider/pull/65)
+- Add Arc testnet [`#64`](https://github.com/fireblocks/fireblocks-web3-provider/pull/64)
+- refactor: enhance error handling in FireblocksWeb3Provider [`8f0ad27`](https://github.com/fireblocks/fireblocks-web3-provider/commit/8f0ad27028fcee14ef73a787d3004737fe396d0b)
+- chore: update test configurations and add .gitignore entries [`61acad5`](https://github.com/fireblocks/fireblocks-web3-provider/commit/61acad5d6d2b6e09d52cced58695269774f6c051)
+- release 1.3.18 [`8ed2867`](https://github.com/fireblocks/fireblocks-web3-provider/commit/8ed2867e78ec84c7d6a7a6d7be23285b0fa0dc88)
+- refactor: improve test code readability and error handling [`3181159`](https://github.com/fireblocks/fireblocks-web3-provider/commit/3181159424a69014521fee407923a943a1f52961)
+- Added Arc testnet [`3a75627`](https://github.com/fireblocks/fireblocks-web3-provider/commit/3a75627ff38594cea3d4cd1a057d15701baeca05)
+- chore: remove address normalization tests for XDC [`9c2dafb`](https://github.com/fireblocks/fireblocks-web3-provider/commit/9c2dafb5feec27c125a894f7ce41700276efbec9)
+- Update asset ID for ARC_TEST in constants.ts [`a3fd516`](https://github.com/fireblocks/fireblocks-web3-provider/commit/a3fd516abf617c86ebf18bc636038388771d84d3)
+- fix: update import path for normalizeAddress in address normalization tests [`0712f59`](https://github.com/fireblocks/fireblocks-web3-provider/commit/0712f59a63738eb0568e5b415a109541b52156ce)
+- feat: :sparkles: add SOPHON chain support [`8ec3309`](https://github.com/fireblocks/fireblocks-web3-provider/commit/8ec3309fb1b25be9a651accbf12065b4f408440f)
+
 #### [v1.3.18](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.3.17...v1.3.18)
 
 > 9 September 2025
