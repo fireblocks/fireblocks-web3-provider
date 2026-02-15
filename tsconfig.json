@@ -1,4 +1,7 @@
 {
+  "ts-node": {
+    "transpileOnly": true
+  },
   "compilerOptions": {
     "target": "ES2017",
     "module": "commonjs",
