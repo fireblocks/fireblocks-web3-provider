@@ -1,9 +1,8 @@
 import util from "util";
-import { DestinationTransferPeerPath, FeeLevel, FireblocksSDK, TransactionArguments, TransactionResponse, TransactionStatus } from "fireblocks-sdk";
+import { Fireblocks, TransactionOperation, TransactionStateEnum, TransferPeerPathType, DestinationTransferPeerPath, TransactionRequest, TransactionResponse } from "@fireblocks/ts-sdk";
 import { getAssetByChain, promiseToFunction, normalizeAddress } from "./utils";
 import { readFileSync } from "fs";
-import { ApiBaseUrl, ChainId, FireblocksProviderConfig, ProviderRpcError, RawMessageType, RequestArguments } from "./types";
-import { PeerType, TransactionOperation } from "fireblocks-sdk";
+import { ApiBaseUrl, ChainId, FeeLevel, FireblocksProviderConfig, ProviderRpcError, RawMessageType, RequestArguments } from "./types";
 import { formatEther, formatUnits } from "@ethersproject/units";
 import { DEBUG_NAMESPACE_ENHANCED_ERROR_HANDLING, DEBUG_NAMESPACE_REQUESTS_AND_RESPONSES, DEBUG_NAMESPACE_TX_STATUS_CHANGES, FINAL_SUCCESSFUL_TRANSACTION_STATES, FINAL_TRANSACTION_STATES } from "./constants";
 import * as ethers from "ethers"
@@ -20,7 +19,7 @@ const logRequestsAndResponses = Debug(DEBUG_NAMESPACE_REQUESTS_AND_RESPONSES);
 
 
 export class FireblocksWeb3Provider extends HttpProvider {
-  private fireblocksApiClient: FireblocksSDK;
+  private fireblocksApiClient: Fireblocks;
   private config: FireblocksProviderConfig;
   private headers: { name: string, value: string }[] = [];
   private accounts: { [vaultId: number]: string } = {};
@@ -88,16 +87,18 @@ export class FireblocksWeb3Provider extends HttpProvider {
         https: proxyAgent
       }
     }
-    this.fireblocksApiClient = new FireblocksSDK(
-      this.parsePrivateKey(config.privateKey),
-      config.apiKey,
-      config.apiBaseUrl || ApiBaseUrl.Production,
-      undefined,
-      {
+    this.fireblocksApiClient = new Fireblocks({
+      apiKey: config.apiKey,
+      secretKey: this.parsePrivateKey(config.privateKey),
+      basePath: this.normalizeApiBaseUrl(config.apiBaseUrl || ApiBaseUrl.Production),
+      additionalOptions: {
         userAgent: this.getUserAgent(),
-        httpsAgent: this?.agent?.https
-      });
-    this.feeLevel = config.fallbackFeeLevel || FeeLevel.MEDIUM
+        baseOptions: {
+          httpsAgent: this?.agent?.https,
+        },
+      },
+    });
+    this.feeLevel = config.fallbackFeeLevel || FeeLevel.Medium
     this.note = config.note ?? 'Created by Fireblocks Web3 Provider'
     this.externalTxId = config.externalTxId;
     this.gaslessGasTankVaultId = config.gaslessGasTankVaultId
@@ -139,6 +140,15 @@ export class FireblocksWeb3Provider extends HttpProvider {
     })
   }
 
+  /** Append "/v1" if missing — ts-sdk requires it in basePath; legacy fireblocks-sdk appended it internally. */
+  private normalizeApiBaseUrl(url: string): string {
+    const trimmed = url.replace(/\/+$/, "")
+    // Only treat trailing "/vN" as a version segment when N is the entire last segment
+    // (avoids false positives like ".../v1/extra" matching mid-path /v1).
+    const lastSegment = trimmed.split("/").pop() || ""
+    return /^v\d+$/.test(lastSegment) ? trimmed : `${trimmed}/v1`
+  }
+
   private parsePrivateKey(privateKey: string): string {
     if (!privateKey) {
       throw Error(`privateKey is required in the fireblocks-web3-provider config`)
@@ -157,11 +167,15 @@ export class FireblocksWeb3Provider extends HttpProvider {
     } catch (error) {
       throw this.createError({ message: `Failed to populate asset and chain ID: ${error instanceof Error ? error.message : String(error)}` })
     }
-    const depositAddresses = await this.fireblocksApiClient.getPaginatedAddresses(this.gaslessGasTankVaultId!.toString(), this.assetId!)
-    if (!depositAddresses?.addresses || depositAddresses.addresses.length === 0) {
+    const depositAddressesResponse = await this.fireblocksApiClient.vaults.getVaultAccountAssetAddressesPaginated({
+      vaultAccountId: this.gaslessGasTankVaultId!.toString(),
+      assetId: this.assetId!,
+    })
+    const firstAddress = depositAddressesResponse.data?.addresses?.[0]?.address
+    if (!firstAddress) {
       throw Error(`Gasless gas tank vault not found (vault id: ${this.gaslessGasTankVaultId})`)
     }
-    this.gaslessGasTankVaultAddress = normalizeAddress(depositAddresses.addresses[0].address, this.assetId)
+    this.gaslessGasTankVaultAddress = normalizeAddress(firstAddress, this.assetId)
     this.accounts[this.gaslessGasTankVaultId!] = this.gaslessGasTankVaultAddress
   }
 
@@ -192,13 +206,13 @@ export class FireblocksWeb3Provider extends HttpProvider {
       throw this.createError({ message: `Failed to populate asset and chain ID: ${error instanceof Error ? error.message : String(error)}` })
     }
 
-    return (await this.fireblocksApiClient.getVaultAccountsWithPageInfo(
-      {
-        assetId: this.assetId,
-        orderBy: "ASC",
-        limit: 20,
-      })).accounts
-      .filter((x: any) => x.assets.some((a: any) => a.id == this.assetId))
+    const pagedResponse = await this.fireblocksApiClient.vaults.getPagedVaultAccounts({
+      assetId: this.assetId,
+      orderBy: "ASC",
+      limit: 20,
+    })
+    return (pagedResponse.data.accounts ?? [])
+      .filter((x: any) => x.assets?.some((a: any) => a.id == this.assetId))
       .map((x: any) => parseInt(x.id))
   }
 
@@ -235,17 +249,22 @@ export class FireblocksWeb3Provider extends HttpProvider {
     for (const vaultAccountId of this.vaultAccountIds) {
       let depositAddresses
       try {
-        depositAddresses = await this.fireblocksApiClient.getPaginatedAddresses(vaultAccountId.toString(), this.assetId!);
+        const response = await this.fireblocksApiClient.vaults.getVaultAccountAssetAddressesPaginated({
+          vaultAccountId: vaultAccountId.toString(),
+          assetId: this.assetId!,
+        });
+        depositAddresses = response.data;
       } catch (error) {
         throw this.createFireblocksError(error)
       }
 
-      if (this.config.vaultAccountIds && (!depositAddresses?.addresses || depositAddresses.addresses.length == 0)) {
+      const firstAddress = depositAddresses?.addresses?.[0]?.address;
+      if (this.config.vaultAccountIds && !firstAddress) {
         throw this.createError({ message: `No ${this.assetId} asset wallet found for vault account with id ${vaultAccountId}` })
       }
 
-      if (depositAddresses?.addresses?.length) {
-        this.accounts[vaultAccountId] = normalizeAddress(depositAddresses.addresses[0].address, this.assetId);
+      if (firstAddress) {
+        this.accounts[vaultAccountId] = normalizeAddress(firstAddress, this.assetId);
       }
     }
   }
@@ -260,12 +279,12 @@ export class FireblocksWeb3Provider extends HttpProvider {
     return this.createError({ message, code })
   }
 
-  private async getWhitelistedWallets(walletsPromise: Promise<any>, type: PeerType, assetId: string) {
+  private async getWhitelistedWallets(walletsPromise: Promise<any>, type: typeof TransferPeerPathType[keyof typeof TransferPeerPathType], assetId: string) {
     return (await walletsPromise).map((x: any) => ({
       type,
       id: x.id,
       name: x.name,
-      address: x.assets.find((a: any) => a.id == assetId)?.address,
+      address: x.assets?.find((a: any) => a.id == assetId)?.address,
     })).filter((x: any) => x.address)
   }
 
@@ -281,9 +300,12 @@ export class FireblocksWeb3Provider extends HttpProvider {
     }
 
     const [externalWallets, internalWallets, contractWallets] = await Promise.all([
-      this.getWhitelistedWallets(this.fireblocksApiClient.getExternalWallets(), PeerType.EXTERNAL_WALLET, this.assetId!),
-      this.getWhitelistedWallets(this.fireblocksApiClient.getInternalWallets(), PeerType.INTERNAL_WALLET, this.assetId!),
-      this.getWhitelistedWallets(this.fireblocksApiClient.getContractWallets(), PeerType.EXTERNAL_WALLET, this.assetId!),
+      this.getWhitelistedWallets(this.fireblocksApiClient.externalWallets.getExternalWallets().then(r => r.data), TransferPeerPathType.ExternalWallet, this.assetId!),
+      this.getWhitelistedWallets(this.fireblocksApiClient.internalWallets.getInternalWallets().then(r => r.data), TransferPeerPathType.InternalWallet, this.assetId!),
+      // Contracts intentionally mapped to ExternalWallet — preserves legacy fireblocks-sdk behavior
+      // (its PeerType enum had no CONTRACT value). ts-sdk adds TransferPeerPathType.Contract, but
+      // switching is a destination-resolution behavior change unrelated to the SDK migration.
+      this.getWhitelistedWallets(this.fireblocksApiClient.contracts.getContracts().then(r => r.data), TransferPeerPathType.ExternalWallet, this.assetId!),
     ])
 
     try {
@@ -293,7 +315,7 @@ export class FireblocksWeb3Provider extends HttpProvider {
     }
 
     const vaultWallets = Object.entries(this.accounts).map(([id, address]) => ({
-      type: PeerType.VAULT_ACCOUNT,
+      type: TransferPeerPathType.VaultAccount,
       id,
       address,
     }))
@@ -362,14 +384,14 @@ export class FireblocksWeb3Provider extends HttpProvider {
 
           case "personal_sign":
           case "eth_sign":
-            result = await this.createPersonalSign(payload.params[1], payload.params[0], TransactionOperation.TYPED_MESSAGE, RawMessageType.ETH_MESSAGE);
+            result = await this.createPersonalSign(payload.params[1], payload.params[0], TransactionOperation.TypedMessage, RawMessageType.ETH_MESSAGE);
             break;
 
           case "eth_signTypedData":
           case "eth_signTypedData_v1":
           case "eth_signTypedData_v3":
           case "eth_signTypedData_v4":
-            result = await this.createPersonalSign(payload.params[0], payload.params[1], TransactionOperation.TYPED_MESSAGE, RawMessageType.EIP712);
+            result = await this.createPersonalSign(payload.params[0], payload.params[1], TransactionOperation.TypedMessage, RawMessageType.EIP712);
             break;
 
           case "eth_signTypedData_v2":
@@ -463,7 +485,7 @@ export class FireblocksWeb3Provider extends HttpProvider {
   private getDestination(address: string): DestinationTransferPeerPath {
     if (this.oneTimeAddressesEnabled) {
       return {
-        type: PeerType.ONE_TIME_ADDRESS,
+        type: TransferPeerPathType.OneTimeAddress,
         oneTimeAddress: {
           address: address || "0x0" // 0x0 for contract creation transactions
         }
@@ -479,7 +501,7 @@ export class FireblocksWeb3Provider extends HttpProvider {
       }
 
       return {
-        type: whitelistedDestination.type as PeerType,
+        type: whitelistedDestination.type as typeof TransferPeerPathType[keyof typeof TransferPeerPathType],
         id: whitelistedDestination.id,
       }
     }
@@ -570,11 +592,11 @@ Available addresses: ${Object.values(this.accounts).join(', ')}.`
     const isEip1559Fees: boolean = (Boolean(maxFee) && Boolean(maxPriorityFeePerGas) && Boolean(gas));
     const isLegacyFees: boolean = (Boolean(gasPrice) && Boolean(gas)) && !isEip1559Fees;
 
-    const transactionArguments: TransactionArguments = {
-      operation: transaction.data ? TransactionOperation.CONTRACT_CALL : TransactionOperation.TRANSFER,
+    const transactionArguments: TransactionRequest = {
+      operation: transaction.data ? TransactionOperation.ContractCall : TransactionOperation.Transfer,
       assetId: this.assetId,
       source: {
-        type: PeerType.VAULT_ACCOUNT,
+        type: TransferPeerPathType.VaultAccount,
         id: vaultAccountId.toString(),
       },
       fee: isLegacyFees ? fee : undefined,
@@ -596,7 +618,7 @@ Available addresses: ${Object.values(this.accounts).join(', ')}.`
     return createTransactionResponse.txHash;
   }
 
-  private async createPersonalSign(address: string, content: any, operation: TransactionOperation, type: RawMessageType): Promise<string> {
+  private async createPersonalSign(address: string, content: any, operation: typeof TransactionOperation[keyof typeof TransactionOperation], type: RawMessageType): Promise<string> {
     await this.initialized()
     const vaultAccountId = this.getVaultAccountIdAndValidateExistence(address, `Signature request from an unsupported address: `);
 
@@ -613,7 +635,7 @@ Available addresses: ${Object.values(this.accounts).join(', ')}.`
     }
 
     let message;
-    if (operation === TransactionOperation.TYPED_MESSAGE) {
+    if (operation === TransactionOperation.TypedMessage) {
       message = {
         content: finalContent,
         index: 0,
@@ -625,11 +647,11 @@ Available addresses: ${Object.values(this.accounts).join(', ')}.`
       };
     }
 
-    const transactionArguments: TransactionArguments = {
+    const transactionArguments: TransactionRequest = {
       operation: operation,
       assetId: this.assetId,
       source: {
-        type: PeerType.VAULT_ACCOUNT,
+        type: TransferPeerPathType.VaultAccount,
         id: vaultAccountId.toString(),
       },
       note: this.note,
@@ -643,27 +665,41 @@ Available addresses: ${Object.values(this.accounts).join(', ')}.`
 
     const txInfo = await this.createTransaction(transactionArguments);
 
-    const sig = txInfo!.signedMessages![0].signature;
+    const sig = txInfo!.signedMessages![0].signature!;
     const v = 27 + sig.v!;
     return "0x" + sig.r + sig.s + v.toString(16);
   }
 
-  private async createTransaction(transactionArguments: TransactionArguments): Promise<TransactionResponse> {
-    const { id } = await this.fireblocksApiClient.createTransaction(transactionArguments);
+  private async createTransaction(transactionRequest: TransactionRequest): Promise<TransactionResponse> {
+    const createResponse = await this.fireblocksApiClient.transactions.createTransaction({ transactionRequest });
+    const id = createResponse.data.id;
+    if (!id) {
+      throw this.createError({ message: 'Fireblocks did not return a transaction id' });
+    }
 
     let txInfo: TransactionResponse;
-    let currentStatus: TransactionStatus = TransactionStatus.SUBMITTED;
+    let currentStatus: TransactionStateEnum = TransactionStateEnum.Submitted;
+    let consecutiveErrors = 0;
+    const MAX_CONSECUTIVE_POLLING_ERRORS = 5;
 
     while (!FINAL_TRANSACTION_STATES.includes(currentStatus)) {
       try {
-        txInfo = await this.fireblocksApiClient.getTransactionById(id);
+        const txResponse = await this.fireblocksApiClient.transactions.getTransaction({ txId: id });
+        txInfo = txResponse.data;
+        consecutiveErrors = 0;
 
-        if (currentStatus != txInfo.status) {
-          logTransactionStatusChange(`Fireblocks transaction ${txInfo.id} changed status from ${currentStatus} to ${txInfo.status} ${txInfo.subStatus ? `(${txInfo.subStatus})` : ''}`)
+        const nextStatus = txInfo.status as TransactionStateEnum;
+        if (currentStatus != nextStatus) {
+          logTransactionStatusChange(`Fireblocks transaction ${txInfo.id} changed status from ${currentStatus} to ${nextStatus} ${txInfo.subStatus ? `(${txInfo.subStatus})` : ''}`)
         }
-        currentStatus = txInfo.status;
+        currentStatus = nextStatus;
       } catch (err) {
-        console.error(this.createFireblocksError(err));
+        consecutiveErrors++;
+        const wrappedError = this.createFireblocksError(err);
+        console.error(wrappedError);
+        if (consecutiveErrors >= MAX_CONSECUTIVE_POLLING_ERRORS) {
+          throw wrappedError;
+        }
       }
       await new Promise(r => setTimeout(r, this.pollingInterval));
     }

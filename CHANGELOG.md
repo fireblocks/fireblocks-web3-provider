@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v1.4.0](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.3.19...v1.4.0)
+
+> 2 June 2026
+
+**Security**
+
+- Resolves Wiz finding **GHSA-x3ff-w252-2g7j** by removing the transitive `@stablelib/ed25519@1.0.3` dependency. Internally migrated from `fireblocks-sdk` to `@fireblocks/ts-sdk@^17.0.0`.
+
+**Public API**
+
+- The `FireblocksWeb3Provider` class, `FireblocksProviderConfig` shape, and EIP-1193 surface are unchanged. Existing consumer code does not need to change.
+- New public re-export: `FeeLevel` (from `@fireblocks/ts-sdk` — keys are `Low`/`Medium`/`High`, string values unchanged: `"LOW"`/`"MEDIUM"`/`"HIGH"`).
+
+**Notes for consumers**
+
+- `fireblocks-sdk` is no longer a dependency. Consumers who imported it directly should add it to their own `package.json`.
+- TypeScript: the element type of `FINAL_TRANSACTION_STATES` and `FINAL_SUCCESSFUL_TRANSACTION_STATES` is now `TransactionStateEnum` (from `@fireblocks/ts-sdk`) instead of `TransactionStatus` (from `fireblocks-sdk`). Same string values; cast to your existing type if you annotated arrays explicitly.
+
+**Behavioral improvements (silent failures now produce explicit errors)**
+
+- Transaction polling aborts with an error after 5 consecutive Fireblocks API errors. Previously, transient errors were silently retried forever. The transaction itself is not cancelled — it remains live in Fireblocks.
+- `eth_sendTransaction` (and equivalents) now throws an explicit error if Fireblocks returns no transaction id. Previously: would hang polling on an undefined id.
+- Account population (`vaultAccountIds` explicitly configured) and gasless gas-tank initialization now throw explicit errors when Fireblocks returns no deposit address for the configured asset.
+
 #### [v1.3.19](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.3.18...v1.3.19)
 
 > 30 November 2025
