@@ -1,4 +1,4 @@
-import { TransactionStatus } from "fireblocks-sdk";
+import { TransactionStateEnum } from "@fireblocks/ts-sdk";
 import { ChainId, Asset } from "./types";
 
 export const ASSETS: { [key: string]: Asset } = {
@@ -93,20 +93,20 @@ export const SIGNER_METHODS = [
   "eth_signTransaction",
 ]
 
-export const FINAL_TRANSACTION_STATES = [
-  TransactionStatus.COMPLETED,
-  TransactionStatus.FAILED,
-  TransactionStatus.CANCELLED,
-  TransactionStatus.BLOCKED,
-  TransactionStatus.REJECTED,
-  TransactionStatus.BROADCASTING,
-  TransactionStatus.CONFIRMING,
+export const FINAL_TRANSACTION_STATES: TransactionStateEnum[] = [
+  TransactionStateEnum.Completed,
+  TransactionStateEnum.Failed,
+  TransactionStateEnum.Cancelled,
+  TransactionStateEnum.Blocked,
+  TransactionStateEnum.Rejected,
+  TransactionStateEnum.Broadcasting,
+  TransactionStateEnum.Confirming,
 ]
 
-export const FINAL_SUCCESSFUL_TRANSACTION_STATES = [
-  TransactionStatus.COMPLETED,
-  TransactionStatus.BROADCASTING,
-  TransactionStatus.CONFIRMING,
+export const FINAL_SUCCESSFUL_TRANSACTION_STATES: TransactionStateEnum[] = [
+  TransactionStateEnum.Completed,
+  TransactionStateEnum.Broadcasting,
+  TransactionStateEnum.Confirming,
 ]
 
 export const DEBUG_NAMESPACE = 'fireblocks-web3-provider'

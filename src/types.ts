@@ -1,5 +1,5 @@
-import { FeeLevel } from "fireblocks-sdk";
-import { AxiosProxyConfig } from "axios";
+import { FeeLevel } from "@fireblocks/ts-sdk";
+export { FeeLevel };
 
 export enum ChainId {
   MAINNET = 1,
