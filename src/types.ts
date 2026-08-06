@@ -78,6 +78,7 @@ export enum ChainId {
   PLUME = 98866,
   SOPHON = 50104,
   ARC_TEST = 5042002,
+  ROBINHOOD = 4663,
 }
 
 export enum ApiBaseUrl {
