@@ -78,6 +78,7 @@ export const ASSETS: { [key: string]: Asset } = {
   [ChainId.PLUME]: {assetId: 'PLUME_PLUME', rpcUrl: "https://plume.drpc.org" },
   [ChainId.SOPHON]: {assetId: 'SOPHON', rpcUrl: "https://rpc.sophon.xyz" },
   [ChainId.ARC_TEST]: {assetId: 'ARC_TEST', rpcUrl: "https://rpc.testnet.arc.network" },
+  [ChainId.ROBINHOOD]: {assetId: 'ROBINHOOD', rpcUrl: "https://rpc.mainnet.chain.robinhood.com" },
 }
 
 export const SIGNER_METHODS = [
