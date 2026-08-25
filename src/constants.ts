@@ -79,6 +79,8 @@ export const ASSETS: { [key: string]: Asset } = {
   [ChainId.SOPHON]: {assetId: 'SOPHON', rpcUrl: "https://rpc.sophon.xyz" },
   [ChainId.ARC_TEST]: {assetId: 'ARC_TEST', rpcUrl: "https://rpc.testnet.arc.network" },
   [ChainId.ROBINHOOD]: {assetId: 'ROBINHOOD', rpcUrl: "https://rpc.mainnet.chain.robinhood.com" },
+  [ChainId.ADI_CHAIN]: {assetId: 'ADI_CHAIN', rpcUrl: "https://rpc.adifoundation.ai" },
+  [ChainId.ADI_CHAIN_TEST]: {assetId: 'ADI_CHAIN_TEST', rpcUrl: "https://rpc.ab.testnet.adifoundation.ai" },
 }
 
 export const SIGNER_METHODS = [

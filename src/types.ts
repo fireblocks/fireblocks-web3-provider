@@ -79,6 +79,8 @@ export enum ChainId {
   SOPHON = 50104,
   ARC_TEST = 5042002,
   ROBINHOOD = 4663,
+  ADI_CHAIN = 36900,
+  ADI_CHAIN_TEST = 99999,
 }
 
 export enum ApiBaseUrl {
