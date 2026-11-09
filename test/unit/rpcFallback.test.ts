@@ -30,7 +30,7 @@ describe("RPC fallback", function () {
 
   // Stubs the HTTP transport: responder decides the outcome per host
   function stubTransport(responder: (host: string) => { error?: Error; response?: any }) {
-    HttpProvider.prototype.send = function (_payload: any, callback: (err: any, res?: any) => void) {
+    HttpProvider.prototype.send = function (this: any, _payload: any, callback: (err: any, res?: any) => void) {
       calledHosts.push(this.host);
       const { error, response } = responder(this.host);
       setImmediate(() => callback(error ?? null, response));

@@ -2,7 +2,7 @@ import util from "util";
 import { Fireblocks, TransactionOperation, TransactionStateEnum, TransferPeerPathType, DestinationTransferPeerPath, TransactionRequest, TransactionResponse } from "@fireblocks/ts-sdk";
 import { getAssetByChain, promiseToFunction, normalizeAddress } from "./utils";
 import { readFileSync } from "fs";
-import { ApiBaseUrl, ChainId, FeeLevel, FireblocksProviderConfig, ProviderRpcError, RawMessageType, RequestArguments } from "./types";
+import { ApiBaseUrl, Asset, ChainId, FeeLevel, FireblocksProviderConfig, ProviderRpcError, RawMessageType, RequestArguments } from "./types";
 import { formatEther, formatUnits } from "@ethersproject/units";
 import { DEBUG_NAMESPACE_ENHANCED_ERROR_HANDLING, DEBUG_NAMESPACE_REQUESTS_AND_RESPONSES, DEBUG_NAMESPACE_TX_STATUS_CHANGES, FINAL_SUCCESSFUL_TRANSACTION_STATES, FINAL_TRANSACTION_STATES } from "./constants";
 import * as ethers from "ethers"
@@ -46,7 +46,7 @@ export class FireblocksWeb3Provider extends HttpProvider {
     if (config.assetId && !config.rpcUrl) {
       throw Error(`If you supply an assetId, you must also supply an rpcUrl`);
     }
-    const asset = config.assetId ? {
+    const asset: Omit<Asset, 'rpcUrl'> & { rpcUrl?: string } = config.assetId ? {
       assetId: config.assetId,
       rpcUrl: config.rpcUrl,
     } : getAssetByChain(config.chainId!);
@@ -81,7 +81,7 @@ export class FireblocksWeb3Provider extends HttpProvider {
     super(config.rpcUrl || asset.rpcUrl)
 
     // A user-provided rpcUrl always wins; fallbacks only apply to the built-in defaults
-    this.rpcUrls = config.rpcUrl ? [config.rpcUrl] : [asset.rpcUrl, ...(asset.fallbackRpcUrls ?? [])]
+    this.rpcUrls = config.rpcUrl ? [config.rpcUrl] : [asset.rpcUrl!, ...(asset.fallbackRpcUrls ?? [])]
     this.config = config
     this.headers = headers;
     if (config.proxyPath) {
