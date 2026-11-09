@@ -93,6 +93,10 @@ export enum ApiBaseUrl {
 export type Asset = {
   assetId: string,
   rpcUrl: string,
+  /**
+   * Tried in order when the default rpcUrl fails. Ignored when the user provides an rpcUrl.
+   */
+  fallbackRpcUrls?: string[],
 }
 
 export enum RawMessageType {

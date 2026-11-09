@@ -22,6 +22,8 @@ export class FireblocksWeb3Provider extends HttpProvider {
   private fireblocksApiClient: Fireblocks;
   private config: FireblocksProviderConfig;
   private headers: { name: string, value: string }[] = [];
+  private rpcUrls: string[] = [];
+  private rpcUrlIndex = 0;
   private accounts: { [vaultId: number]: string } = {};
   private vaultAccountIds?: number[];
   private assetId?: string;
@@ -78,6 +80,8 @@ export class FireblocksWeb3Provider extends HttpProvider {
 
     super(config.rpcUrl || asset.rpcUrl)
 
+    // A user-provided rpcUrl always wins; fallbacks only apply to the built-in defaults
+    this.rpcUrls = config.rpcUrl ? [config.rpcUrl] : [asset.rpcUrl, ...(asset.fallbackRpcUrls ?? [])]
     this.config = config
     this.headers = headers;
     if (config.proxyPath) {
@@ -216,9 +220,55 @@ export class FireblocksWeb3Provider extends HttpProvider {
       .map((x: any) => parseInt(x.id))
   }
 
+  // Sends a payload to the RPC node. If the node fails, retries on the next default rpcUrl, starting from the last one that worked.
+  // JSON-RPC errors such as reverts are not endpoint failures and are returned as-is. So is the last url's response.
+  private async rpcSend(payload: any): Promise<any> {
+    for (let attempt = 0; attempt < this.rpcUrls.length; attempt++) {
+      const index = (this.rpcUrlIndex + attempt) % this.rpcUrls.length;
+      const isLastAttempt = attempt === this.rpcUrls.length - 1;
+      // HttpProvider.send reads this.host synchronously, so concurrent requests always hit the url set here
+      this.host = this.rpcUrls[index];
+
+      let response: any;
+      try {
+        response = await util.promisify<any, any>(super.send).bind(this)(payload);
+      } catch (e) {
+        if (isLastAttempt) {
+          throw e;
+        }
+        logEnhancedErrorHandling(`RPC endpoint ${this.host} failed (${e instanceof Error ? e.message : String(e)}), falling back to the next default endpoint`);
+        continue;
+      }
+
+      if (!this.isRpcEndpointFailure(response)) {
+        this.rpcUrlIndex = index;
+        return response;
+      }
+      if (isLastAttempt) {
+        return response;
+      }
+      logEnhancedErrorHandling(`RPC endpoint ${this.host} returned ${JSON.stringify(response)}, falling back to the next default endpoint`);
+    }
+    throw this.createError({ message: 'No RPC url configured' });
+  }
+
+  // e.g. polygon-rpc.com's 401 body {"error":"API key disabled..."} or a rate limit, as opposed to a JSON-RPC error from the chain
+  private isRpcEndpointFailure(response: any): boolean {
+    if (Array.isArray(response)) {
+      return false;
+    }
+    if (!response || typeof response !== 'object' || response.jsonrpc === undefined) {
+      return true;
+    }
+    if (response.error !== undefined && typeof response.error !== 'object') {
+      return true;
+    }
+    return response.error?.code === -32005;
+  }
+
   // Called by the constructor in case rpcUrl is provided, and chainId not
   private async populateAssetAndChainId() {
-    const chainId = (await util.promisify<any, any>(super.send).bind(this)(formatJsonRpcRequest('eth_chainId', []))).result
+    const chainId = (await this.rpcSend(formatJsonRpcRequest('eth_chainId', []))).result
     this.chainId = Number(chainId)
 
     if (!this.assetId) {
@@ -403,7 +453,7 @@ export class FireblocksWeb3Provider extends HttpProvider {
             })
 
           default:
-            const jsonRpcResponse = await util.promisify<any, any>(super.send).bind(this)(payload)
+            const jsonRpcResponse = await this.rpcSend(payload)
 
             if (jsonRpcResponse.error) {
               if (payload.method == 'eth_estimateGas') {

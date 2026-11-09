@@ -19,3 +19,21 @@ describe("ASSETS — ADI Chain mapping", function () {
     });
   });
 });
+
+describe("ASSETS — Polygon mapping", function () {
+  it("maps Polygon mainnet (chain id 137) to PublicNode with dRPC fallback", function () {
+    expect(getAssetByChain(ChainId.POLYGON)).to.deep.equal({
+      assetId: "MATIC_POLYGON",
+      rpcUrl: "https://polygon-bor-rpc.publicnode.com",
+      fallbackRpcUrls: ["https://polygon.drpc.org"],
+    });
+  });
+
+  it("maps Polygon Amoy (chain id 80002) to PublicNode with dRPC fallback", function () {
+    expect(getAssetByChain(ChainId.POLYGON_AMOY)).to.deep.equal({
+      assetId: "AMOY_POLYGON_TEST",
+      rpcUrl: "https://polygon-amoy-bor-rpc.publicnode.com",
+      fallbackRpcUrls: ["https://polygon-amoy.drpc.org"],
+    });
+  });
+});
