@@ -693,6 +693,7 @@ Available addresses: ${Object.values(this.accounts).join(', ')}.`
           logTransactionStatusChange(`Fireblocks transaction ${txInfo.id} changed status from ${currentStatus} to ${nextStatus} ${txInfo.subStatus ? `(${txInfo.subStatus})` : ''}`)
         }
         currentStatus = nextStatus;
+        if (FINAL_TRANSACTION_STATES.includes(currentStatus)) break;
       } catch (err) {
         consecutiveErrors++;
         const wrappedError = this.createFireblocksError(err);
@@ -701,9 +702,7 @@ Available addresses: ${Object.values(this.accounts).join(', ')}.`
           throw wrappedError;
         }
       }
-      if (!FINAL_TRANSACTION_STATES.includes(currentStatus)) {
-        await new Promise(r => setTimeout(r, this.pollingInterval));
-      }
+      await new Promise(r => setTimeout(r, this.pollingInterval));
     }
 
     if (!FINAL_SUCCESSFUL_TRANSACTION_STATES.includes(currentStatus)) {
