@@ -53,6 +53,22 @@ function mockClient(opts: {
   } as any;
 }
 
+async function countSleeps<T>(action: () => Promise<T>): Promise<{ result: T; sleepCalls: number }> {
+  const originalSetTimeout = global.setTimeout;
+  let sleepCalls = 0;
+  global.setTimeout = ((handler: (...args: any[]) => void, _timeout?: number, ...args: any[]) => {
+    sleepCalls++;
+    return originalSetTimeout(handler, 0, ...args);
+  }) as typeof setTimeout;
+
+  try {
+    const result = await action();
+    return { result, sleepCalls };
+  } finally {
+    global.setTimeout = originalSetTimeout;
+  }
+}
+
 describe("createTransaction polling loop", function () {
   this.timeout(5000);
 
@@ -63,20 +79,9 @@ describe("createTransaction polling loop", function () {
         getTransactionSequence: [{ status: TransactionStateEnum.Completed }],
       });
 
-      const originalSetTimeout = global.setTimeout;
-      let sleepCalls = 0;
-      global.setTimeout = ((handler: (...args: any[]) => void, _timeout?: number, ...args: any[]) => {
-        sleepCalls++;
-        return originalSetTimeout(handler, 0, ...args);
-      }) as typeof setTimeout;
-
-      try {
-        const result = await (provider as any).createTransaction({});
-        expect(result.status).to.equal(TransactionStateEnum.Completed);
-        expect(sleepCalls).to.equal(0);
-      } finally {
-        global.setTimeout = originalSetTimeout;
-      }
+      const { result, sleepCalls } = await countSleeps(() => (provider as any).createTransaction({}));
+      expect(result.status).to.equal(TransactionStateEnum.Completed);
+      expect(sleepCalls).to.equal(0);
     });
 
     // Both BROADCASTING and CONFIRMING are treated as final-successful — same branch.
@@ -112,9 +117,24 @@ describe("createTransaction polling loop", function () {
         },
       };
 
-      const result = await (provider as any).createTransaction({});
+      const { result, sleepCalls } = await countSleeps(() => (provider as any).createTransaction({}));
       expect(result.status).to.equal(TransactionStateEnum.Completed);
       expect(pollCount).to.equal(3);
+      expect(sleepCalls).to.equal(2);
+    });
+
+    it("sleeps after a transient getTransaction error before retrying", async function () {
+      const provider = buildProvider();
+      const apiError: any = new Error("temporary network error");
+      apiError.response = { status: 503, data: { message: "Service Unavailable" } };
+      (provider as any).fireblocksApiClient = mockClient({
+        getTransactionErrors: [apiError],
+        getTransactionSequence: [{ status: TransactionStateEnum.Completed }],
+      });
+
+      const { result, sleepCalls } = await countSleeps(() => (provider as any).createTransaction({}));
+      expect(result.status).to.equal(TransactionStateEnum.Completed);
+      expect(sleepCalls).to.equal(1);
     });
 
     for (const terminal of [
