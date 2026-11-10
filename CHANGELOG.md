@@ -6,12 +6,8 @@ All notable changes to this project will be documented in this file. Dates are d
 
 **Fixes**
 
-- Polygon mainnet's default RPC `polygon-rpc.com` no longer allows public access (HTTP 401). The default is now `polygon-bor-rpc.publicnode.com`, with `polygon.drpc.org` as fallback.
-- Polygon Amoy's default RPC `rpc-amoy.polygon.technology` was retired. The default is now `polygon-amoy-bor-rpc.publicnode.com`, with `polygon-amoy.drpc.org` as fallback.
-
-**Behavioral changes**
-
-- Built-in RPC defaults can now define fallback endpoints. A failing default (connection error, non-JSON-RPC response, or rate limit `-32005`) is retried on the next endpoint, which then stays in use. JSON-RPC errors such as reverts are not retried. A user-provided `rpcUrl` is never combined with fallbacks.
+- Polygon mainnet's default RPC `polygon-rpc.com` no longer allows public access (HTTP 401). The default is now `polygon-bor-rpc.publicnode.com`.
+- Polygon Amoy's default RPC `rpc-amoy.polygon.technology` was retired. The default is now `polygon-amoy-bor-rpc.publicnode.com`.
 
 #### [v1.4.0](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.3.19...v1.4.0)
 
