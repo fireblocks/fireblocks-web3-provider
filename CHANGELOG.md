@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### Unreleased
+
+**Behavioral changes**
+
+- Built-in RPC defaults can now define fallback endpoints. Polygon and Amoy fall back to dRPC. A failing default (connection error, non-JSON-RPC response, or rate limit `-32005`) is retried on the next endpoint, which then stays in use. JSON-RPC errors such as reverts are not retried. A user-provided `rpcUrl` is never combined with fallbacks.
+
 #### [v1.4.0](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.3.19...v1.4.0)
 
 > 2 June 2026
