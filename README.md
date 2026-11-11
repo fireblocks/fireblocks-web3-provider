@@ -32,6 +32,11 @@ const eip1193Provider = new FireblocksWeb3Provider({
 })
 ```
 
+### RPC endpoints
+When only `chainId` is given, the provider uses a built-in public RPC endpoint for that chain.
+
+Public endpoints are rate-limited and have no uptime guarantee. For production, pass your own `rpcUrl` from a node provider. A provided `rpcUrl` replaces the built-in endpoint.
+
 ## Usage with ethers.js
 ```sh
 npm install ethers
