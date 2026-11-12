@@ -693,6 +693,7 @@ Available addresses: ${Object.values(this.accounts).join(', ')}.`
           logTransactionStatusChange(`Fireblocks transaction ${txInfo.id} changed status from ${currentStatus} to ${nextStatus} ${txInfo.subStatus ? `(${txInfo.subStatus})` : ''}`)
         }
         currentStatus = nextStatus;
+        if (FINAL_TRANSACTION_STATES.includes(currentStatus)) break;
       } catch (err) {
         consecutiveErrors++;
         const wrappedError = this.createFireblocksError(err);
