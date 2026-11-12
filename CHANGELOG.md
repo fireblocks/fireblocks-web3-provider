@@ -2,7 +2,9 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
-#### Unreleased
+#### [v1.5.1](https://github.com/fireblocks/fireblocks-web3-provider/compare/v1.5.0...v1.5.1)
+
+> 12 November 2026
 
 **Fixes**
 
